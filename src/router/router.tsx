@@ -8,13 +8,13 @@ export default function AppRouter() {
   return (
     <Routes>
       {/* Auth */}
-      <Route element={<AuthLayout />}>
-        <Route path="/login" element={<LoginPage />} />
+      <Route element={<MainLayout />}>
+        <Route path="/home" element={<HomePage/>} />
       </Route>
 
       {/* Main */}
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<HomePage />} />
+      <Route element={<AuthLayout  />}>
+        <Route path="/" element={<LoginPage  />} />
       </Route>
 
       {/* fallback */}
