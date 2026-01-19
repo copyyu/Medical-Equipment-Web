@@ -12,7 +12,7 @@ import {
 } from 'react-icons/hi2'
 
 const menuItems = [
-  { path: '/', icon: HiOutlineHome, label: 'Dashboard' },
+  { path: '/home', icon: HiOutlineHome, label: 'Dashboard' },
   { path: '/equipment', icon: HiOutlineCube, label: 'อุปกรณ์การแพทย์' },
   { path: '/rent', icon: HiOutlineUsers, label: 'เช่ายืม' },
   { path: '/hiring', icon: HiOutlineChatBubbleLeftRight, label: 'จัดจ้าง' },
