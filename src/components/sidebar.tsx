@@ -13,7 +13,7 @@ import {
 
 const menuItems = [
   { path: '/home', icon: HiOutlineHome, label: 'Dashboard' },
-  { path: '/equipment', icon: HiOutlineCube, label: 'อุปกรณ์การแพทย์' },
+  { path: '/add-equipment', icon: HiOutlineCube, label: 'เพิ่มอุปกรณ์การแพทย์' },
   { path: '/rent', icon: HiOutlineUsers, label: 'เช่ายืม' },
   { path: '/hiring', icon: HiOutlineChatBubbleLeftRight, label: 'จัดจ้าง' },
   { path: '/reports', icon: HiOutlineChartBar, label: 'รายงาน' },
