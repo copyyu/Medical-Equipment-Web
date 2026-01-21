@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import Navbar from '../components/navbar'
 import Sidebar from '../components/sidebar'
 
+
 export default function MainLayout() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100/50 to-gray-50">

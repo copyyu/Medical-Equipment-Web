@@ -5,8 +5,8 @@ import {
   HiOutlineCube,
   HiOutlineUsers,
   HiOutlineChatBubbleLeftRight,
-  HiOutlineChartBar,
-  HiOutlineCog6Tooth,
+  // HiOutlineChartBar,
+  // HiOutlineCog6Tooth,
   HiOutlineChevronLeft,
   HiOutlineChevronRight
 } from 'react-icons/hi2'
@@ -15,9 +15,9 @@ const menuItems = [
   { path: '/home', icon: HiOutlineHome, label: 'Dashboard' },
   { path: '/add-equipment', icon: HiOutlineCube, label: 'เพิ่มอุปกรณ์การแพทย์' },
   { path: '/rent', icon: HiOutlineUsers, label: 'เช่ายืม' },
-  { path: '/hiring', icon: HiOutlineChatBubbleLeftRight, label: 'จัดจ้าง' },
-  { path: '/reports', icon: HiOutlineChartBar, label: 'รายงาน' },
-  { path: '/settings', icon: HiOutlineCog6Tooth, label: 'ตั้งค่า' },
+  { path: '/ticket', icon: HiOutlineChatBubbleLeftRight, label: 'Ticket' },
+  // { path: '/reports', icon: HiOutlineChartBar, label: 'รายงาน' },
+  // { path: '/settings', icon: HiOutlineCog6Tooth, label: 'ตั้งค่า' },
 ]
 
 export default function Sidebar() {

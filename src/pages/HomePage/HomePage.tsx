@@ -1,6 +1,6 @@
 import { HiOutlineCalendarDays, HiOutlineBolt } from 'react-icons/hi2'
 
-import StatCard from '../../components/StatCard'
+import StatCard from '../../components/Status/StatCard'
 import AssetStatusSection from '../../components/AssetStatusSection'
 import JobStatusSection from '../../components/JobStatusSection'
 
