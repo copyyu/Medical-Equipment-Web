@@ -4,6 +4,7 @@ import MainLayout from '../layouts/MainLayout'
 import LoginPage from '../pages/LoginPage/LoginPage'
 import HomePage from '../pages/HomePage/HomePage'
 import AddEquipmentPage from '../pages/Equipment/AddEquipmentPage'
+import TicketPage from '../pages/Ticket/TicketPage'
 
 export default function AppRouter() {
   return (
@@ -17,6 +18,8 @@ export default function AppRouter() {
       <Route element={<MainLayout />}>
         <Route path="/home" element={<HomePage/>} />
         <Route path="/add-equipment" element={<AddEquipmentPage/>} />
+
+        <Route path='/ticket' element={<TicketPage/>} />
       </Route>
 
       {/* fallback */}
