@@ -4,23 +4,22 @@ import MainLayout from '../layouts/MainLayout'
 import LoginPage from '../pages/LoginPage/LoginPage'
 import HomePage from '../pages/HomePage/HomePage'
 import AddEquipmentPage from '../pages/Equipment/AddEquipmentPage'
-import EquipmentListPage from '../pages/Equipment/EquipmentListPage'
 import TicketPage from '../pages/Ticket/TicketPage'
 
 export default function AppRouter() {
   return (
     <Routes>
       {/* Auth */}
-      <Route element={<AuthLayout />}>
-        <Route path="/" element={<LoginPage />} />
+      <Route element={<AuthLayout  />}>
+        <Route path="/" element={<LoginPage  />} />
       </Route>
 
       {/* Main */}
       <Route element={<MainLayout />}>
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/add-equipment" element={<AddEquipmentPage />} />
-        <Route path="/equipment" element={<EquipmentListPage />} />
-        <Route path='/ticket' element={<TicketPage />} />
+        <Route path="/home" element={<HomePage/>} />
+        <Route path="/add-equipment" element={<AddEquipmentPage/>} />
+
+        <Route path='/ticket' element={<TicketPage/>} />
       </Route>
 
       {/* fallback */}
