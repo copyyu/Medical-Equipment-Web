@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 import {
   HiOutlineHome,
   HiOutlineCube,
+  HiOutlineClipboardDocumentList,
   HiOutlineUsers,
   HiOutlineChatBubbleLeftRight,
   // HiOutlineChartBar,
@@ -13,6 +14,7 @@ import {
 
 const menuItems = [
   { path: '/home', icon: HiOutlineHome, label: 'Dashboard' },
+  { path: '/equipment', icon: HiOutlineClipboardDocumentList, label: 'รายการอุปกรณ์' },
   { path: '/add-equipment', icon: HiOutlineCube, label: 'เพิ่มอุปกรณ์การแพทย์' },
   { path: '/rent', icon: HiOutlineUsers, label: 'เช่ายืม' },
   { path: '/ticket', icon: HiOutlineChatBubbleLeftRight, label: 'Ticket' },
