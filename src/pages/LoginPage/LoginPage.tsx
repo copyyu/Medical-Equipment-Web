@@ -1,40 +1,32 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { useAuthStore } from '../../stores/authStore';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const navigate = useNavigate();
+  const { login, isLoading, error: authError, clearError } = useAuthStore();
+  
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleSubmit = async () => {
-    setError('');
-    setIsLoading(true);
+    // Clear previous errors
+    clearError();
+
+    // Validation
+    if (!username || !password) {
+      return;
+    }
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password })
-      // });
-      // const data = await response.json();
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock validation
-      if (email === 'admin@medical.com' && password === 'admin123') {
-        console.log('Login successful!');
-        // TODO: Handle successful login (redirect, store token, etc.)
-      } else {
-        setError('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
-      }
-    } catch (err) {
-      setError('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
-    } finally {
-      setIsLoading(false);
+      await login({ username, password });
+      // ถ้า login สำเร็จจะ redirect อัตโนมัติผ่าน AppRouter
+      navigate('/home');
+    } catch (error) {
+      // Error จะถูกจัดการใน authStore แล้ว
+      console.error('Login failed:', error);
     }
   };
 
@@ -49,36 +41,36 @@ export default function LoginPage() {
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Medical Equipment</h1>
-          {/* <p className="text-gray-600">Admin Dashboard Login</p> */}
         </div>
 
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <div className="space-y-6">
             {/* Error Message */}
-            {error && (
+            {authError && (
               <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <span>{error}</span>
+                <span>{authError}</span>
               </div>
             )}
 
-            {/* Email Input */}
+            {/* Username Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                อีเมล
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                ชื่อผู้ใช้
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
-                  placeholder="admin@example.com"
+                  placeholder="กรอกชื่อผู้ใช้"
                   required
-                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  disabled={isLoading}
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition disabled:bg-gray-50 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -98,22 +90,28 @@ export default function LoginPage() {
                   onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  disabled={isLoading}
+                  className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition disabled:bg-gray-50 disabled:cursor-not-allowed"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                  disabled={isLoading}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition disabled:cursor-not-allowed"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
-            {/* Remember Me & Forgot Password */}
+            {/* Remember Me */}
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500" />
+                <input 
+                  type="checkbox" 
+                  disabled={isLoading}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed" 
+                />
                 <span className="text-sm text-gray-600">จดจำฉันไว้</span>
               </label>
             </div>
@@ -121,7 +119,7 @@ export default function LoginPage() {
             {/* Submit Button */}
             <button
               onClick={handleSubmit}
-              disabled={isLoading}
+              disabled={isLoading || !username || !password}
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {isLoading ? (
@@ -137,19 +135,7 @@ export default function LoginPage() {
               )}
             </button>
           </div>
-
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <p className="text-xs font-semibold text-gray-700 mb-2">ข้อมูลทดสอบ (Demo):</p>
-            <p className="text-xs text-gray-600">Email: admin@medical.com</p>
-            <p className="text-xs text-gray-600">Password: admin123</p>
-          </div>
         </div>
-
-        {/* Footer */}
-        {/* <p className="text-center text-sm text-gray-500 mt-6">
-          © 2024 Medical Equipment System. All rights reserved.
-        </p> */}
       </div>
     </div>
   );
