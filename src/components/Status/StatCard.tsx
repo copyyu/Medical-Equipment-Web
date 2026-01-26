@@ -7,6 +7,19 @@ import {
     HiOutlineArrowsRightLeft,
     HiOutlineExclamationTriangle
 } from 'react-icons/hi2'
+import type { IconType } from 'react-icons'
+
+interface StatCardData {
+    totalEquipment: number
+    rentalEquipment: number
+    nearExpiry: number
+    totalMaintenance: number
+}
+
+interface StatCardProps {
+    data?: StatCardData | null
+    isLoading?: boolean
+}
 
 // Animated counter hook
 function useCounter(end: number, duration: number = 2000) {
@@ -33,44 +46,90 @@ function useCounter(end: number, duration: number = 2000) {
     return count
 }
 
-// Stats data
-const stats = [
-    {
-        icon: HiOutlineCube,
-        label: 'อุปกรณ์ทั้งหมด',
-        rawValue: 186,
-        change: '+12%',
-        isUp: true,
-        gradient: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)'
-    },
-    {
-        icon: HiOutlineArrowsRightLeft,
-        label: 'อุปกรณ์เช่ายืม',
-        rawValue: 42,
-        change: '+15%',
-        isUp: true,
-        gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
-    },
-    {
-        icon: HiOutlineExclamationTriangle,
-        label: 'ใกล้หมดอายุ',
-        rawValue: 12,
-        change: '-3',
-        isUp: false,
-        gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-    },
-    {
-        icon: HiOutlineClipboardDocumentList,
-        label: 'งานซ่อมทั้งหมด',
-        rawValue: 188,
-        change: '+5%',
-        isUp: true,
-        gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-    },
-]
+interface StatItem {
+    icon: IconType
+    label: string
+    rawValue: number
+    change: string
+    isUp: boolean
+    gradient: string
+}
+
+// Stats data factory
+function createStats(data: StatCardData): StatItem[] {
+    return [
+        {
+            icon: HiOutlineCube,
+            label: 'อุปกรณ์ทั้งหมด',
+            rawValue: data.totalEquipment,
+            change: '+12%',
+            isUp: true,
+            gradient: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)'
+        },
+        {
+            icon: HiOutlineArrowsRightLeft,
+            label: 'อุปกรณ์เช่ายืม',
+            rawValue: data.rentalEquipment,
+            change: '+15%',
+            isUp: true,
+            gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+        },
+        {
+            icon: HiOutlineExclamationTriangle,
+            label: 'ใกล้หมดอายุ',
+            rawValue: data.nearExpiry,
+            change: '-3',
+            isUp: false,
+            gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+        },
+        {
+            icon: HiOutlineClipboardDocumentList,
+            label: 'งานซ่อมทั้งหมด',
+            rawValue: data.totalMaintenance,
+            change: '+5%',
+            isUp: true,
+            gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+        },
+    ]
+}
+
+// Default data for fallback
+const defaultData: StatCardData = {
+    totalEquipment: 0,
+    rentalEquipment: 0,
+    nearExpiry: 0,
+    totalMaintenance: 0
+}
+
+// Skeleton Loader Component
+function StatCardSkeleton({ index }: { index: number }) {
+    return (
+        <div
+            className="relative overflow-hidden rounded-2xl p-6 animate-pulse"
+            style={{
+                animationDelay: `${index * 100}ms`,
+                background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)'
+            }}
+        >
+            <div className="relative">
+                <div className="flex items-start justify-between">
+                    <div>
+                        <div className="h-4 w-24 bg-gray-300 rounded mb-3"></div>
+                        <div className="h-8 w-16 bg-gray-300 rounded"></div>
+                    </div>
+                    <div className="p-3 bg-gray-300 rounded-xl w-12 h-12"></div>
+                </div>
+                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-300/50">
+                    <div className="h-5 w-14 bg-gray-300 rounded-full"></div>
+                    <div className="h-3 w-20 bg-gray-300 rounded"></div>
+                </div>
+            </div>
+        </div>
+    )
+}
 
 // Single Stat Card
-function StatCardItem({ stat, index }: { stat: typeof stats[0], index: number }) {
+function StatCardItem({ stat, index }: { stat: StatItem, index: number }) {
     const Icon = stat.icon
     const count = useCounter(stat.rawValue, 1500 + index * 200)
 
@@ -115,7 +174,19 @@ function StatCardItem({ stat, index }: { stat: typeof stats[0], index: number })
 }
 
 // Stats Section Component
-export default function StatCard() {
+export default function StatCard({ data, isLoading = false }: StatCardProps) {
+    const stats = createStats(data ?? defaultData)
+
+    if (isLoading) {
+        return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {[0, 1, 2, 3].map((index) => (
+                    <StatCardSkeleton key={index} index={index} />
+                ))}
+            </div>
+        )
+    }
+
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {stats.map((stat, index) => (

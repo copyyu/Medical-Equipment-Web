@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     HiOutlineMagnifyingGlass,
     HiOutlineFunnel,
     HiOutlinePlus,
     HiOutlineChevronLeft,
-    HiOutlineChevronRight
+    HiOutlineChevronRight,
+    HiOutlineArrowPath,
+    HiOutlineExclamationTriangle
 } from 'react-icons/hi2'
 
 // Components
@@ -13,18 +15,20 @@ import EquipmentTable, { type EquipmentListItem } from '../../components/Table/E
 import ViewEquipmentModal from '../../components/Modal/ViewEquipmentModal'
 import EditEquipmentModal from '../../components/Modal/EditEquipmentModal'
 
-// Mock data & configs
-import { mockEquipment } from '../../constants/mockData'
-import { EQUIPMENT_STATUS_CONFIG } from '../../types/equipment'
+// Hooks & API
+import { useEquipmentList } from '../../hooks/useEquipmentList'
 
-// Filter options
+
+// Filter options - mapped to API status values (Asset Status)
 const STATUS_OPTIONS = [
-    { value: 'ทั้งหมด', label: 'ทั้งหมด' },
-    { value: 'พร้อมใช้', label: 'พร้อมใช้' },
-    { value: 'กำลังใช้งาน', label: 'กำลังใช้งาน' },
-    { value: 'อุปกรณ์ชำรุด', label: 'อุปกรณ์ชำรุด' },
-    { value: 'ชำรุด', label: 'ชำรุด' },
-    { value: 'หมดอายุ', label: 'หมดอายุ' }
+    { value: '', label: 'ทั้งหมด' },
+    { value: 'active', label: 'Active (ใช้งานอยู่)' },
+    { value: 'defective', label: 'Defective (ชำรุด)' },
+    { value: 'wait_decom', label: 'Wait Decom (รอปลดระวาง)' },
+    { value: 'decommission', label: 'Decommission (ปลดระวางแล้ว)' },
+    { value: 'active_ready_to_sell', label: 'Active-Ready to Sell (พร้อมขาย)' },
+    { value: 'missing', label: 'Missing (สูญหาย)' },
+    { value: 'plan_to_replace', label: 'Plan to Replace (รอเปลี่ยนใหม่)' }
 ]
 
 const CATEGORY_OPTIONS = [
@@ -36,46 +40,55 @@ const CATEGORY_OPTIONS = [
 
 export default function EquipmentListPage() {
     const navigate = useNavigate()
+    const itemsPerPage = 8
 
-    // Data state
-    // TODO: เชื่อม API - ใช้ useEffect เพื่อ fetch ข้อมูลจาก API
-    const [equipment, setEquipment] = useState<EquipmentListItem[]>(mockEquipment)
+    // API Hook
+    const {
+        data: equipment,
+        isLoading,
+        error,
+        total,
+        page: currentPage,
+        totalPages,
+        refetch,
+        setParams
+    } = useEquipmentList({ page: 1, limit: itemsPerPage })
 
     // Search & Filter state
     const [searchTerm, setSearchTerm] = useState('')
     const [isFilterOpen, setIsFilterOpen] = useState(false)
-    const [statusFilter, setStatusFilter] = useState<string>('ทั้งหมด')
+    const [statusFilter, setStatusFilter] = useState<string>('')
     const [categoryFilter, setCategoryFilter] = useState<string>('ทั้งหมด')
-
-    // Pagination state
-    const [currentPage, setCurrentPage] = useState(1)
-    const itemsPerPage = 8
 
     // Modal state
     const [selectedEquipment, setSelectedEquipment] = useState<EquipmentListItem | null>(null)
     const [isViewModalOpen, setIsViewModalOpen] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
-    // Filter equipment based on search and filters
+    // Update API params when filters change
+    useEffect(() => {
+        const debounceTimer = setTimeout(() => {
+            setParams({
+                page: 1,
+                limit: itemsPerPage,
+                search: searchTerm || undefined,
+                status: statusFilter || undefined
+            })
+        }, 300) // Debounce search
+
+        return () => clearTimeout(debounceTimer)
+    }, [searchTerm, statusFilter, setParams])
+
+    // Filter by category locally (since API doesn't support it yet)
     const filteredEquipment = equipment.filter(item => {
-        const matchesSearch =
-            item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.location.toLowerCase().includes(searchTerm.toLowerCase())
-
-        const matchesStatus = statusFilter === 'ทั้งหมด' || EQUIPMENT_STATUS_CONFIG[item.status].label === statusFilter
         const matchesCategory = categoryFilter === 'ทั้งหมด' || item.category === categoryFilter
-
-        return matchesSearch && matchesStatus && matchesCategory
+        return matchesCategory
     })
 
-    // Pagination
-    const totalPages = Math.ceil(filteredEquipment.length / itemsPerPage)
-    const paginatedEquipment = filteredEquipment.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    )
+    // Page change handler
+    const handlePageChange = (newPage: number) => {
+        setParams({ page: newPage, limit: itemsPerPage })
+    }
 
     // Handlers
     const handleView = (item: EquipmentListItem) => {
@@ -94,31 +107,45 @@ export default function EquipmentListPage() {
     }
 
     const handleSaveEdit = (updatedItem: EquipmentListItem) => {
-        // TODO: เชื่อม API - อัพเดทข้อมูลอุปกรณ์
-        // const updateEquipment = async () => {
-        //   await fetch(`/api/equipment/${updatedItem.id}`, {
-        //     method: 'PUT',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify(updatedItem)
-        //   })
-        // }
-        setEquipment(prev =>
-            prev.map(item => item.id === updatedItem.id ? updatedItem : item)
-        )
+        // TODO: Call update API
+        console.log('Save edit:', updatedItem)
+        refetch()
     }
 
     const handleDelete = (item: EquipmentListItem) => {
-        // TODO: เชื่อม API - ลบข้อมูลอุปกรณ์
-        // const deleteEquipment = async () => {
-        //   await fetch(`/api/equipment/${item.id}`, { method: 'DELETE' })
-        // }
+        // TODO: Call delete API
         if (confirm(`ต้องการลบอุปกรณ์ ${item.name} (${item.id}) หรือไม่?`)) {
-            setEquipment(prev => prev.filter(eq => eq.id !== item.id))
+            console.log('Delete:', item.id)
+            refetch()
         }
     }
 
     const handleAddEquipment = () => {
         navigate('/add-equipment')
+    }
+
+    // Error state
+    if (error && !isLoading) {
+        return (
+            <div className="p-8">
+                <div className="min-h-[60vh] flex items-center justify-center">
+                    <div className="bg-white rounded-2xl border border-red-100 p-8 max-w-md w-full text-center shadow-lg">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <HiOutlineExclamationTriangle className="w-8 h-8 text-red-600" />
+                        </div>
+                        <h2 className="text-xl font-bold text-gray-900 mb-2">ไม่สามารถโหลดข้อมูลได้</h2>
+                        <p className="text-gray-500 text-sm mb-6">{error}</p>
+                        <button
+                            onClick={refetch}
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-all"
+                        >
+                            <HiOutlineArrowPath className="w-4 h-4" />
+                            ลองใหม่อีกครั้ง
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -146,6 +173,14 @@ export default function EquipmentListPage() {
 
                     {/* Actions */}
                     <div className="flex gap-3">
+                        <button
+                            onClick={refetch}
+                            disabled={isLoading}
+                            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all shadow-sm disabled:opacity-50"
+                        >
+                            <HiOutlineArrowPath className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                            รีเฟรช
+                        </button>
                         <button
                             onClick={() => setIsFilterOpen(!isFilterOpen)}
                             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all shadow-sm ${isFilterOpen
@@ -197,42 +232,58 @@ export default function EquipmentListPage() {
                 )}
             </div>
 
+            {/* Loading State */}
+            {isLoading && (
+                <div className="flex items-center justify-center py-12">
+                    <div className="flex items-center gap-3 text-gray-500">
+                        <HiOutlineArrowPath className="w-5 h-5 animate-spin" />
+                        <span>กำลังโหลดข้อมูล...</span>
+                    </div>
+                </div>
+            )}
+
             {/* Equipment Table */}
-            <EquipmentTable
-                data={paginatedEquipment}
-                onView={handleView}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-            />
+            {!isLoading && (
+                <EquipmentTable
+                    data={filteredEquipment}
+                    onView={handleView}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                />
+            )}
 
             {/* Pagination */}
             <div className="mt-4 flex items-center justify-between">
                 <p className="text-sm text-gray-500">
-                    แสดง {paginatedEquipment.length} จาก {filteredEquipment.length} รายการ
+                    แสดง {filteredEquipment.length} จาก {total} รายการ
                 </p>
                 <div className="flex items-center gap-2">
                     <button
-                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                        disabled={currentPage === 1}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1 || isLoading}
                         className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <HiOutlineChevronLeft className="w-4 h-4" />
                     </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                        <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${currentPage === page
-                                ? 'bg-emerald-500 text-white'
-                                : 'text-gray-600 hover:bg-gray-100'
-                                }`}
-                        >
-                            {page}
-                        </button>
-                    ))}
+                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                        const pageNum = i + 1
+                        return (
+                            <button
+                                key={pageNum}
+                                onClick={() => handlePageChange(pageNum)}
+                                disabled={isLoading}
+                                className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${currentPage === pageNum
+                                    ? 'bg-emerald-500 text-white'
+                                    : 'text-gray-600 hover:bg-gray-100'
+                                    }`}
+                            >
+                                {pageNum}
+                            </button>
+                        )
+                    })}
                     <button
-                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                        disabled={currentPage === totalPages || totalPages === 0}
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages || totalPages === 0 || isLoading}
                         className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <HiOutlineChevronRight className="w-4 h-4" />

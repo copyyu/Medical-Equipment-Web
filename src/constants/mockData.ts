@@ -263,14 +263,14 @@ export const mockRequests: RequestItem[] = [
 import type { EquipmentListItem } from '../types/equipment'
 
 export const mockEquipment: EquipmentListItem[] = [
-    { id: 'E4-201', name: 'เครื่องวัดความดัน', category: 'เครื่องปรับอากาศ', status: 'ready', location: 'อาคาร A ชั้น 2', lastCheck: '2025-01-05', expiry: '2026-01-05' },
-    { id: 'E4-155', name: 'เครื่องออกซิเจน', category: 'อุปกรณ์ทางการแพทย์', status: 'in_use', location: 'ห้องผู้ป่วย ICU', lastCheck: '2025-01-03', expiry: '2025-04-15' },
-    { id: 'E4-009', name: 'เครื่องวัดความดัน', category: 'อุปกรณ์ทางการแพทย์', status: 'maintenance', location: 'เก็บคลัง', lastCheck: '2024-12-29', expiry: '2025-12-28' },
-    { id: 'E4-234', name: 'เครื่องส่งสาธารณภัย', category: 'อุปกรณ์ทางการแพทย์', status: 'ready', location: 'ห้องฉุกเฉินพิเศษ', lastCheck: '2025-01-10', expiry: '2027-03-20' },
-    { id: 'E4-12', name: 'เครื่องผสมเก่าเฉพาะ', category: 'อุปกรณ์ทางการแพทย์', status: 'broken', location: 'ห้องผสมพิเศษ', lastCheck: '2024-12-15', expiry: '2025-02-28' },
-    { id: 'E4-345', name: 'เสี่ยงคู่บ่าย', category: 'เครื่องมือแพทย์การแพทย์', status: 'ready', location: 'ห้องพักผู้ป่วย', lastCheck: '2025-01-08', expiry: '2030-12-31' },
-    { id: 'E4-456', name: 'เครื่องช่วยหายใจ', category: 'อุปกรณ์ทางการแพทย์', status: 'in_use', location: 'ห้อง ICU', lastCheck: '2025-01-01', expiry: '2026-08-10' },
-    { id: 'E4-567', name: 'เครื่องวัดออกซิเจน', category: 'อุปกรณ์ทางการแพทย์', status: 'ready', location: 'เก็บคลัง', lastCheck: '2025-01-12', expiry: '2026-05-25' },
-    { id: 'E4-678', name: 'เครื่องกระตุ้นหัวใจ', category: 'อุปกรณ์ทางการแพทย์', status: 'ready', location: 'ห้องฉุกเฉิน', lastCheck: '2025-01-15', expiry: '2027-06-15' },
-    { id: 'E4-789', name: 'เครื่องเอกซเรย์', category: 'เครื่องมือแพทย์การแพทย์', status: 'in_use', location: 'ห้องเอกซเรย์', lastCheck: '2025-01-18', expiry: '2028-09-30' },
+    { id: 'E4-201', name: 'เครื่องวัดความดัน', category: 'เครื่องปรับอากาศ', status: 'active', location: 'อาคาร A ชั้น 2', lastCheck: '2025-01-05', expiry: '2026-01-05' },
+    { id: 'E4-155', name: 'เครื่องออกซิเจน', category: 'อุปกรณ์ทางการแพทย์', status: 'active', location: 'ห้องผู้ป่วย ICU', lastCheck: '2025-01-03', expiry: '2025-04-15' },
+    { id: 'E4-009', name: 'เครื่องวัดความดัน', category: 'อุปกรณ์ทางการแพทย์', status: 'wait_decom', location: 'เก็บคลัง', lastCheck: '2024-12-29', expiry: '2025-12-28' },
+    { id: 'E4-234', name: 'เครื่องส่งสาธารณภัย', category: 'อุปกรณ์ทางการแพทย์', status: 'active', location: 'ห้องฉุกเฉินพิเศษ', lastCheck: '2025-01-10', expiry: '2027-03-20' },
+    { id: 'E4-12', name: 'เครื่องผสมเก่าเฉพาะ', category: 'อุปกรณ์ทางการแพทย์', status: 'defective', location: 'ห้องผสมพิเศษ', lastCheck: '2024-12-15', expiry: '2025-02-28' },
+    { id: 'E4-345', name: 'เสี่ยงคู่บ่าย', category: 'เครื่องมือแพทย์การแพทย์', status: 'active', location: 'ห้องพักผู้ป่วย', lastCheck: '2025-01-08', expiry: '2030-12-31' },
+    { id: 'E4-456', name: 'เครื่องช่วยหายใจ', category: 'อุปกรณ์ทางการแพทย์', status: 'active_ready_to_sell', location: 'ห้อง ICU', lastCheck: '2025-01-01', expiry: '2026-08-10' },
+    { id: 'E4-567', name: 'เครื่องวัดออกซิเจน', category: 'อุปกรณ์ทางการแพทย์', status: 'active', location: 'เก็บคลัง', lastCheck: '2025-01-12', expiry: '2026-05-25' },
+    { id: 'E4-678', name: 'เครื่องกระตุ้นหัวใจ', category: 'อุปกรณ์ทางการแพทย์', status: 'missing', location: 'ห้องฉุกเฉิน', lastCheck: '2025-01-15', expiry: '2027-06-15' },
+    { id: 'E4-789', name: 'เครื่องเอกซเรย์', category: 'เครื่องมือแพทย์การแพทย์', status: 'plan_to_replace', location: 'ห้องเอกซเรย์', lastCheck: '2025-01-18', expiry: '2028-09-30' },
 ]

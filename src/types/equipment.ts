@@ -1,5 +1,13 @@
 // ===== Equipment List Item (สำหรับตารางรายการอุปกรณ์) =====
-export type EquipmentStatus = 'ready' | 'in_use' | 'maintenance' | 'broken' | 'expired'
+// Asset Status ตรงกับ Backend API: Active, Defective, Wait Decom, Decommission, Active-Ready to Sell, Missing, Plan to Replace
+export type EquipmentStatus =
+  | 'active'
+  | 'defective'
+  | 'wait_decom'
+  | 'decommission'
+  | 'active_ready_to_sell'
+  | 'missing'
+  | 'plan_to_replace'
 
 export interface EquipmentListItem {
   id: string
@@ -9,14 +17,17 @@ export interface EquipmentListItem {
   location: string
   lastCheck: string
   expiry: string
+  isExpiring?: boolean  // flag ใกล้หมดอายุ (≤1 ปี)
 }
 
-export const EQUIPMENT_STATUS_CONFIG: Record<EquipmentStatus, { label: string; bgColor: string; textColor: string }> = {
-  ready: { label: 'พร้อมใช้', bgColor: 'bg-emerald-100', textColor: 'text-emerald-700' },
-  in_use: { label: 'กำลังใช้งาน', bgColor: 'bg-blue-100', textColor: 'text-blue-700' },
-  maintenance: { label: 'อุปกรณ์ชำรุด', bgColor: 'bg-red-100', textColor: 'text-red-700' },
-  broken: { label: 'ชำรุด', bgColor: 'bg-orange-100', textColor: 'text-orange-700' },
-  expired: { label: 'หมดอายุ', bgColor: 'bg-red-100', textColor: 'text-red-700' }
+export const EQUIPMENT_STATUS_CONFIG: Record<EquipmentStatus, { label: string; labelThai: string; bgColor: string; textColor: string }> = {
+  active: { label: 'Active', labelThai: 'ใช้งานอยู่', bgColor: 'bg-emerald-100', textColor: 'text-emerald-700' },
+  defective: { label: 'Defective', labelThai: 'ชำรุด', bgColor: 'bg-red-100', textColor: 'text-red-700' },
+  wait_decom: { label: 'Wait Decom', labelThai: 'รอปลดระวาง', bgColor: 'bg-amber-100', textColor: 'text-amber-700' },
+  decommission: { label: 'Decommission', labelThai: 'ปลดระวางแล้ว', bgColor: 'bg-gray-100', textColor: 'text-gray-600' },
+  active_ready_to_sell: { label: 'Active-Ready to Sell', labelThai: 'พร้อมขาย', bgColor: 'bg-blue-100', textColor: 'text-blue-700' },
+  missing: { label: 'Missing', labelThai: 'สูญหาย', bgColor: 'bg-orange-100', textColor: 'text-orange-700' },
+  plan_to_replace: { label: 'Plan to Replace', labelThai: 'รอเปลี่ยนใหม่', bgColor: 'bg-purple-100', textColor: 'text-purple-700' }
 }
 
 // ===== Equipment Form Data (สำหรับกรอกข้อมูล) =====

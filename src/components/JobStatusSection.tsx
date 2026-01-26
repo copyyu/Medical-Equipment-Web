@@ -6,8 +6,15 @@ import {
     HiOutlineArrowUpTray
 } from 'react-icons/hi2'
 
-import { JOB_STATUS_CONFIG, MOCK_JOB_STATUS_COUNTS, MOCK_RECENT_JOBS } from '../constants/mockData'
+import { JOB_STATUS_CONFIG } from '../constants/mockData'
 import type { JobStatus } from '../types/status'
+import type { JobStatusCount, RecentJob } from '../types/dashboard'
+
+interface JobStatusSectionProps {
+    jobStatusData?: JobStatusCount[] | null
+    recentJobs?: RecentJob[] | null
+    isLoading?: boolean
+}
 
 // Icon mapping
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -41,6 +48,50 @@ function useCounter(end: number, duration: number = 2000) {
     return count
 }
 
+// Skeleton Loader Component
+function JobStatusSkeleton() {
+    return (
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm animate-pulse">
+            <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gray-200 rounded-xl"></div>
+                    <div>
+                        <div className="h-5 w-24 bg-gray-200 rounded mb-2"></div>
+                        <div className="h-3 w-28 bg-gray-200 rounded"></div>
+                    </div>
+                </div>
+                <div className="h-4 w-16 bg-gray-200 rounded"></div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 mb-5">
+                {[0, 1, 2].map((index) => (
+                    <div key={index} className="flex flex-col items-center justify-center p-5 rounded-xl border border-gray-100 bg-gray-50">
+                        <div className="w-12 h-12 bg-gray-200 rounded-xl mb-3"></div>
+                        <div className="h-7 w-10 bg-gray-200 rounded mb-2"></div>
+                        <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="border-t border-gray-100 pt-4">
+                <div className="h-4 w-24 bg-gray-200 rounded mb-3"></div>
+                <div className="space-y-2">
+                    {[0, 1, 2].map((index) => (
+                        <div key={index} className="flex items-center gap-3 p-2.5">
+                            <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+                            <div className="flex-1">
+                                <div className="h-4 w-32 bg-gray-200 rounded mb-1"></div>
+                                <div className="h-3 w-24 bg-gray-200 rounded"></div>
+                            </div>
+                            <div className="h-5 w-16 bg-gray-200 rounded-full"></div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    )
+}
+
 // Job Status Card Component
 function JobStatusCard({ status, count, delay }: { status: JobStatus, count: number, delay: number }) {
     const config = JOB_STATUS_CONFIG[status]
@@ -67,7 +118,14 @@ function JobStatusCard({ status, count, delay }: { status: JobStatus, count: num
 }
 
 // Job Status Section Component
-export default function JobStatusSection() {
+export default function JobStatusSection({ jobStatusData, recentJobs, isLoading = false }: JobStatusSectionProps) {
+    if (isLoading) {
+        return <JobStatusSkeleton />
+    }
+
+    const statusData = jobStatusData ?? []
+    const jobs = recentJobs ?? []
+
     return (
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow animate-slide-up delay-200">
             <div className="flex items-center justify-between mb-5">
@@ -87,8 +145,8 @@ export default function JobStatusSection() {
 
             {/* Job Status Cards */}
             <div className="grid grid-cols-3 gap-3 mb-5">
-                {MOCK_JOB_STATUS_COUNTS.map((item, index) => (
-                    <JobStatusCard key={item.status} status={item.status} count={item.count} delay={index} />
+                {statusData.map((item, index) => (
+                    <JobStatusCard key={item.status} status={item.status as JobStatus} count={item.count} delay={index} />
                 ))}
             </div>
 
@@ -96,8 +154,10 @@ export default function JobStatusSection() {
             <div className="border-t border-gray-100 pt-4">
                 <p className="text-sm font-medium text-gray-700 mb-3">งานซ่อมล่าสุด</p>
                 <div className="space-y-2">
-                    {MOCK_RECENT_JOBS.slice(0, 3).map((job) => {
-                        const config = JOB_STATUS_CONFIG[job.status]
+                    {jobs.slice(0, 3).map((job) => {
+                        // Map API status to local JobStatus type
+                        const jobStatus = job.status as JobStatus
+                        const config = JOB_STATUS_CONFIG[jobStatus] ?? JOB_STATUS_CONFIG['in_process']
                         const Icon = iconMap[config.icon]
                         return (
                             <div key={job.id} className="group flex items-center gap-3 p-2.5 -mx-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
@@ -105,8 +165,8 @@ export default function JobStatusSection() {
                                     {Icon && <Icon className={`w-4 h-4 ${config.color}`} />}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm text-gray-700 truncate">{job.equipmentName}</p>
-                                    <p className="text-xs text-gray-400">{job.id} • {job.updatedAt}</p>
+                                    <p className="text-sm text-gray-700 truncate">{job.equipment_name}</p>
+                                    <p className="text-xs text-gray-400">{job.id} • {job.updated_at}</p>
                                 </div>
                                 <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${config.bgColor} ${config.color} border ${config.borderColor}`}>
                                     {config.label}
