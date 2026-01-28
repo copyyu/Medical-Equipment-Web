@@ -87,7 +87,7 @@ export default function EquipmentTable({ data, onView, onEdit, onDelete }: Equip
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`px-3 py-1 rounded-md text-xs font-medium ${statusConfig.bgColor} ${statusConfig.textColor}`}>
-                                            {statusConfig.label}
+                                            {statusConfig.labelThai}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">

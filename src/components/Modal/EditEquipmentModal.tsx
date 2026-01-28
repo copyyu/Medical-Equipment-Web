@@ -17,11 +17,13 @@ const CATEGORY_OPTIONS = [
 ]
 
 const STATUS_OPTIONS = [
-    { value: 'ready', label: 'พร้อมใช้' },
-    { value: 'in_use', label: 'กำลังใช้งาน' },
-    { value: 'maintenance', label: 'อุปกรณ์ชำรุด' },
-    { value: 'broken', label: 'ชำรุด' },
-    { value: 'expired', label: 'หมดอายุ' }
+    { value: 'active', label: 'Active (ใช้งานอยู่)' },
+    { value: 'defective', label: 'Defective (ชำรุด)' },
+    { value: 'wait_decom', label: 'Wait Decom (รอปลดระวาง)' },
+    { value: 'decommission', label: 'Decommission (ปลดระวางแล้ว)' },
+    { value: 'active_ready_to_sell', label: 'Active-Ready to Sell (พร้อมขาย)' },
+    { value: 'missing', label: 'Missing (สูญหาย)' },
+    { value: 'plan_to_replace', label: 'Plan to Replace (รอเปลี่ยนใหม่)' }
 ]
 
 export default function EditEquipmentModal({ equipment, isOpen, onClose, onSave }: EditEquipmentModalProps) {
