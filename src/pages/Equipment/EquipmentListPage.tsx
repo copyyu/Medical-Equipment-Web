@@ -18,26 +18,7 @@ import DeleteConfirmModal from '../../components/Modal/DeleteConfirmModal'
 
 // Hooks & API
 import { useEquipmentList } from '../../hooks/useEquipmentList'
-
-
-// Filter options - mapped to API status values (Asset Status)
-const STATUS_OPTIONS = [
-    { value: '', label: 'ทั้งหมด' },
-    { value: 'active', label: 'Active (ใช้งานอยู่)' },
-    { value: 'defective', label: 'Defective (ชำรุด)' },
-    { value: 'wait_decom', label: 'Wait Decom (รอปลดระวาง)' },
-    { value: 'decommission', label: 'Decommission (ปลดระวางแล้ว)' },
-    { value: 'active_ready_to_sell', label: 'Active-Ready to Sell (พร้อมขาย)' },
-    { value: 'missing', label: 'Missing (สูญหาย)' },
-    { value: 'plan_to_replace', label: 'Plan to Replace (รอเปลี่ยนใหม่)' }
-]
-
-const CATEGORY_OPTIONS = [
-    'ทั้งหมด',
-    'อุปกรณ์ทางการแพทย์',
-    'เครื่องปรับอากาศ',
-    'เครื่องมือแพทย์การแพทย์'
-]
+import { STATUS_OPTIONS, CATEGORY_OPTIONS } from '../../constants/equipmentOptions'
 
 export default function EquipmentListPage() {
     const navigate = useNavigate()

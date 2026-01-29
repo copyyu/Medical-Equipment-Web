@@ -1,28 +1,21 @@
-import type { DashboardCard } from "../types";
+// ===== Application Configuration =====
+// Centralized configuration constants
 
-export const DASHBOARD_CARDS: DashboardCard[] = [
-  {
-    title: "Today's Sales",
-    value: "$95.00",
-    sub: "+2.5% This Month",
-    bg: "bg-lime-200/70",
-  },
-  {
-    title: "Available Categories",
-    value: "1.457%",
-    sub: "+2.5% This Month",
-    bg: "bg-teal-200/70",
-  },
-  {
-    title: "Expired Medicines",
-    value: "0.00%",
-    sub: "+2.5% This Month",
-    bg: "bg-rose-200/70",
-  },
-  {
-    title: "System Users",
-    value: "255K",
-    sub: "+2.5% This Month",
-    bg: "bg-indigo-200/70",
-  },
-];
+// Pagination defaults
+export const PAGINATION = {
+  DEFAULT_PAGE_SIZE: 8,
+  PAGE_SIZE_OPTIONS: [8, 16, 24, 32]
+} as const
+
+// Auto-refresh intervals (in milliseconds)
+export const REFRESH_INTERVALS = {
+  DASHBOARD: 30000,  // 30 seconds
+  EQUIPMENT_LIST: 60000  // 1 minute
+} as const
+
+// Date formats
+export const DATE_FORMATS = {
+  DISPLAY: 'DD/MM/YYYY',
+  API: 'YYYY-MM-DD',
+  DATETIME: 'DD/MM/YYYY HH:mm'
+} as const

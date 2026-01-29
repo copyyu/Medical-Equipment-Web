@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { HiXMark } from 'react-icons/hi2'
 import type { EquipmentListItem } from '../../types/equipment'
 import { updateEquipment } from '../../service/equipmentApi'
+import { STATUS_OPTIONS_NO_ALL, CATEGORY_OPTIONS_NO_ALL } from '../../constants/equipmentOptions'
 
 interface EditEquipmentModalProps {
     equipment: EquipmentListItem | null
@@ -9,23 +10,6 @@ interface EditEquipmentModalProps {
     onClose: () => void
     onSave: (data: EquipmentListItem) => void
 }
-
-const CATEGORY_OPTIONS = [
-    'อุปกรณ์ทางการแพทย์',
-    'ระบบปรับอากาศ',
-    'เครื่องมือแพทย์การแพทย์',
-    'เครื่องปรับอากาศ'
-]
-
-const STATUS_OPTIONS = [
-    { value: 'active', label: 'Active (ใช้งานอยู่)' },
-    { value: 'defective', label: 'Defective (ชำรุด)' },
-    { value: 'wait_decom', label: 'Wait Decom (รอปลดระวาง)' },
-    { value: 'decommission', label: 'Decommission (ปลดระวางแล้ว)' },
-    { value: 'active_ready_to_sell', label: 'Active-Ready to Sell (พร้อมขาย)' },
-    { value: 'missing', label: 'Missing (สูญหาย)' },
-    { value: 'plan_to_replace', label: 'Plan to Replace (รอเปลี่ยนใหม่)' }
-]
 
 export default function EditEquipmentModal({ equipment, isOpen, onClose, onSave }: EditEquipmentModalProps) {
     const [formData, setFormData] = useState<EquipmentListItem | null>(null)
@@ -133,7 +117,7 @@ export default function EditEquipmentModal({ equipment, isOpen, onClose, onSave 
                                     onChange={(e) => handleChange('category', e.target.value)}
                                     className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-500 appearance-none cursor-pointer"
                                 >
-                                    {CATEGORY_OPTIONS.map(cat => (
+                                    {CATEGORY_OPTIONS_NO_ALL.map(cat => (
                                         <option key={cat} value={cat}>{cat}</option>
                                     ))}
                                 </select>
@@ -145,7 +129,7 @@ export default function EditEquipmentModal({ equipment, isOpen, onClose, onSave 
                                     onChange={(e) => handleChange('status', e.target.value)}
                                     className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent-500 appearance-none cursor-pointer"
                                 >
-                                    {STATUS_OPTIONS.map(opt => (
+                                    {STATUS_OPTIONS_NO_ALL.map(opt => (
                                         <option key={opt.value} value={opt.value}>{opt.label}</option>
                                     ))}
                                 </select>

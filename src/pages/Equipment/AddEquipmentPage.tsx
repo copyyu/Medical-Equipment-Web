@@ -5,21 +5,6 @@ import EquipmentForm from '../../components/form/EquipmentForm';
 import ExcelUpload from '../../components/form/ExcelUpload';
 import type { EquipmentFormData } from '../../types/equipment';
 
-interface EquipmentData {
-  equipmentCode: string;
-  equipmentName: string;
-  category: string;
-  brand: string;
-  model: string;
-  serialNumber: string;
-  purchaseDate: string;
-  warrantyExpiry: string;
-  price: string;
-  location: string;
-  status: string;
-  description: string;
-}
-
 type TabType = 'manual' | 'excel';
 
 const AddEquipmentPage: React.FC = () => {
@@ -28,7 +13,7 @@ const AddEquipmentPage: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
 
   // ฟังก์ชันสำหรับเพิ่มข้อมูลทีละรายการ
-  const handleFormSubmit = async (data: EquipmentData) => {
+  const handleFormSubmit = (data: EquipmentFormData) => {
     try {
       // TODO: เรียก API เพื่อบันทึกข้อมูล
       console.log('Form data to submit:', data);
@@ -116,8 +101,8 @@ const AddEquipmentPage: React.FC = () => {
               <button
                 onClick={() => setActiveTab('manual')}
                 className={`py-4 px-8 text-sm font-medium border-b-2 transition-colors ${activeTab === 'manual'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
               >
                 <div className="flex items-center space-x-2">
@@ -130,8 +115,8 @@ const AddEquipmentPage: React.FC = () => {
               <button
                 onClick={() => setActiveTab('excel')}
                 className={`py-4 px-8 text-sm font-medium border-b-2 transition-colors ${activeTab === 'excel'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
               >
                 <div className="flex items-center space-x-2">
