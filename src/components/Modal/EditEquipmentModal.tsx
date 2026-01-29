@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { HiXMark } from 'react-icons/hi2'
 import type { EquipmentListItem } from '../../types/equipment'
+import { updateEquipment } from '../../service/equipmentApi'
 
 interface EditEquipmentModalProps {
     equipment: EquipmentListItem | null
     isOpen: boolean
     onClose: () => void
-    onSave: (data: EquipmentListItem) => void // TODO: Replace with API call
+    onSave: (data: EquipmentListItem) => void
 }
 
 const CATEGORY_OPTIONS = [
@@ -29,11 +30,13 @@ const STATUS_OPTIONS = [
 export default function EditEquipmentModal({ equipment, isOpen, onClose, onSave }: EditEquipmentModalProps) {
     const [formData, setFormData] = useState<EquipmentListItem | null>(null)
     const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     // Reset form when equipment changes
     useEffect(() => {
         if (equipment) {
             setFormData({ ...equipment })
+            setError(null)
         }
     }, [equipment])
 
@@ -48,21 +51,25 @@ export default function EditEquipmentModal({ equipment, isOpen, onClose, onSave 
         if (!formData) return
 
         setIsLoading(true)
+        setError(null)
         try {
-            // TODO: Call API here
-            // await equipmentApi.update(formData.id, formData)
-
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 500))
+            // Call the real API
+            await updateEquipment(formData.id, {
+                status: formData.status,
+                location: formData.location,
+                compute_date: formData.lastCheck
+            })
 
             onSave(formData)
             onClose()
-        } catch (error) {
-            console.error('Error updating equipment:', error)
+        } catch (err) {
+            console.error('Error updating equipment:', err)
+            setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการบันทึก')
         } finally {
             setIsLoading(false)
         }
     }
+
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -84,6 +91,13 @@ export default function EditEquipmentModal({ equipment, isOpen, onClose, onSave 
                         <HiXMark className="w-5 h-5" />
                     </button>
                 </div>
+
+                {/* Error Message */}
+                {error && (
+                    <div className="mx-6 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-sm text-red-600">{error}</p>
+                    </div>
+                )}
 
                 {/* Form */}
                 <form onSubmit={handleSubmit}>
