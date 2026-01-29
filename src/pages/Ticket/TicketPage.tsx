@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import type { RequestItem } from '../../types/status';
 import TicketTable from '../../components/Table/TicketTable';
-import FilterBar from '../../components/FilterBar';
+import FilterBar from '../../components/filter/FilterBar';
 import TicketStatCard from '../../components/Status/TicketStatCard';
 import ViewRequestModal from '../../components/Modal/ViewRequestModal';
 import EditRequestModal from '../../components/Modal/EditRequestModal';
@@ -18,16 +18,16 @@ export default function TicketPage() {
   const [editingRequest, setEditingRequest] = useState<RequestItem | null>(null);
 
   const filteredData = mockRequests.filter((item) => {
-    const matchesSearch = 
+    const matchesSearch =
       item.requestNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.equipmentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.requesterName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesType = selectedType === 'all' || item.requestType === selectedType;
     const matchesStatus = selectedStatus === 'all' || item.status === selectedStatus;
     const matchesPriority = selectedPriority === 'all' || item.priority === selectedPriority;
-    
+
     return matchesSearch && matchesType && matchesStatus && matchesPriority;
   });
 
@@ -57,7 +57,7 @@ export default function TicketPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-1">Ticket</h1>
         <p className="text-sm text-gray-500">จัดการคำขอจากผู้ใช้ เช่น แจ้งซ่อม แจ้งเปลี่ยน และบำรุงรักษาอุปกรณ์</p>
       </div>
-      
+
       <TicketStatCard
         total={stats.total}
         pending={stats.pending}

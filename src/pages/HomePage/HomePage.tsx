@@ -1,8 +1,8 @@
 import { HiOutlineCalendarDays, HiOutlineBolt, HiOutlineArrowPath, HiOutlineExclamationTriangle } from 'react-icons/hi2'
 
 import StatCard from '../../components/Status/StatCard'
-import AssetStatusSection from '../../components/AssetStatusSection'
-import JobStatusSection from '../../components/JobStatusSection'
+import AssetStatusSection from '../../components/dashboard/AssetStatusSection'
+import JobStatusSection from '../../components/dashboard/JobStatusSection'
 import { useDashboard } from '../../hooks/useDashboard'
 
 export default function HomePage() {
