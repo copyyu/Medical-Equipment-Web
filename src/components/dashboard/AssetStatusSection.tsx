@@ -10,9 +10,9 @@ import {
     HiOutlineArrowPath
 } from 'react-icons/hi2'
 
-import { ASSET_STATUS_CONFIG } from '../constants/mockData'
-import type { AssetStatus } from '../types/status'
-import type { AssetStatusCount } from '../types/dashboard'
+import { ASSET_STATUS_CONFIG } from '../../constants/mockData'
+import type { AssetStatus } from '../../types/status'
+import type { AssetStatusCount } from '../../types/dashboard'
 
 interface AssetStatusSectionProps {
     data?: AssetStatusCount[] | null

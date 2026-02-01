@@ -1,6 +1,6 @@
 // components/EquipmentForm.tsx
 import React, { useState } from 'react';
-import type { EquipmentFormData, EquipmentFormProps } from '../types/equipment';
+import type { EquipmentFormData, EquipmentFormProps } from '../../types/equipment';
 
 const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => {
   const [formData, setFormData] = useState<EquipmentFormData>({
@@ -49,24 +49,24 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
     const receiveDate = new Date(formData.receiveDate);
     const computeDate = new Date();
-    
+
     // อายุเครื่อง = ปีปัจจุบัน - ปีรับเครื่อง
     const equipmentAge = parseFloat(
       ((computeDate.getTime() - receiveDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25)).toFixed(2)
     );
-    
+
     // อายุคาดหวัง (default = 10 ปี)
     const lifeExpectancy = formData.lifeExpectancy || 10;
-    
+
     // อายุคงเหลือ = อายุคาดหวัง - อายุเครื่อง
     const remainLife = parseFloat((lifeExpectancy - equipmentAge).toFixed(2));
-    
+
     // %การใช้งาน = (อายุเครื่อง / อายุคาดหวัง) × 100
     const usefulLifetimePercent = parseFloat(((equipmentAge / lifeExpectancy) * 100).toFixed(2));
-    
+
     // ปีที่ต้องเปลี่ยน = ปีรับเครื่อง + อายุคาดหวัง
     const replacementYear = receiveDate.getFullYear() + Math.ceil(lifeExpectancy);
-    
+
     setFormData(prev => ({
       ...prev,
       equipmentAge: equipmentAge,

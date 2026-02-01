@@ -1,6 +1,6 @@
 import type { EquipmentListItem } from '../types/equipment'
 
-const BASE_URL = 'http://localhost:8081'
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081'
 
 // API Response Types
 export interface EquipmentListResponse {
@@ -102,4 +102,69 @@ export async function fetchEquipmentList(params: EquipmentListParams = {}): Prom
         limit: result.data.limit,
         totalPages: result.data.total_pages
     }
+}
+
+// Equipment Update Request
+export interface EquipmentUpdateRequest {
+    status?: string
+    location?: string
+    compute_date?: string
+}
+
+// Update equipment by ID
+export async function updateEquipment(id: string, data: EquipmentUpdateRequest): Promise<void> {
+    const url = `${BASE_URL}/api/equipment/${id}`
+    const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const result: ApiResponse<null> = await response.json()
+
+    if (!result.success) {
+        throw new Error(result.message || 'Failed to update equipment')
+    }
+}
+
+// Delete equipment by ID
+export async function deleteEquipment(id: string): Promise<void> {
+    const url = `${BASE_URL}/api/equipment/${id}`
+    const response = await fetch(url, {
+        method: 'DELETE'
+    })
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const result: ApiResponse<null> = await response.json()
+
+    if (!result.success) {
+        throw new Error(result.message || 'Failed to delete equipment')
+    }
+}
+
+// Get equipment detail by ID
+export async function getEquipmentById(id: string): Promise<EquipmentListItem> {
+    const url = `${BASE_URL}/api/equipment/${id}`
+    const response = await fetch(url)
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const result: ApiResponse<EquipmentApiItem> = await response.json()
+
+    if (!result.success) {
+        throw new Error(result.message || 'Failed to get equipment')
+    }
+
+    return mapApiItemToFrontend(result.data)
 }

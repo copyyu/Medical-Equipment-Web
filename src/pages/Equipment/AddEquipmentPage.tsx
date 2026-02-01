@@ -1,24 +1,9 @@
 // pages/AddEquipmentPage.tsx
 import React, { useState } from 'react';
 
-import EquipmentForm from '../../components/EquipmentForm';
-import ExcelUpload from '../../components/ExcelUpload';
+import EquipmentForm from '../../components/form/EquipmentForm';
+import ExcelUpload from '../../components/form/ExcelUpload';
 import type { EquipmentFormData } from '../../types/equipment';
-
-interface EquipmentData {
-  equipmentCode: string;
-  equipmentName: string;
-  category: string;
-  brand: string;
-  model: string;
-  serialNumber: string;
-  purchaseDate: string;
-  warrantyExpiry: string;
-  price: string;
-  location: string;
-  status: string;
-  description: string;
-}
 
 type TabType = 'manual' | 'excel';
 
@@ -28,27 +13,27 @@ const AddEquipmentPage: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState('');
 
   // ฟังก์ชันสำหรับเพิ่มข้อมูลทีละรายการ
-  const handleFormSubmit = async (data: EquipmentData) => {
+  const handleFormSubmit = (data: EquipmentFormData) => {
     try {
       // TODO: เรียก API เพื่อบันทึกข้อมูล
       console.log('Form data to submit:', data);
-      
+
       // จำลองการเรียก API
       // const response = await fetch('/api/equipment', {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify(data)
       // });
-      
+
       // แสดงข้อความสำเร็จ
       setSuccessMessage('บันทึกข้อมูลเรียบร้อยแล้ว');
       setShowSuccessModal(true);
-      
+
       // ซ่อนข้อความหลัง 3 วินาที
       setTimeout(() => {
         setShowSuccessModal(false);
       }, 3000);
-      
+
     } catch (error) {
       console.error('Error submitting form:', error);
       alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
@@ -60,23 +45,23 @@ const AddEquipmentPage: React.FC = () => {
     try {
       // TODO: เรียก API เพื่อบันทึกข้อมูลแบบ bulk
       console.log('Excel data to import:', data);
-      
+
       // จำลองการเรียก API
       // const response = await fetch('/api/equipment/bulk', {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify({ items: data })
       // });
-      
+
       // แสดงข้อความสำเร็จ
       setSuccessMessage(`นำเข้าข้อมูลสำเร็จ ${data.length} รายการ`);
       setShowSuccessModal(true);
-      
+
       // ซ่อนข้อความหลัง 3 วินาที
       setTimeout(() => {
         setShowSuccessModal(false);
       }, 3000);
-      
+
     } catch (error) {
       console.error('Error importing data:', error);
       alert('เกิดข้อผิดพลาดในการนำเข้าข้อมูล');
@@ -115,11 +100,10 @@ const AddEquipmentPage: React.FC = () => {
             <nav className="flex -mb-px">
               <button
                 onClick={() => setActiveTab('manual')}
-                className={`py-4 px-8 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === 'manual'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`py-4 px-8 text-sm font-medium border-b-2 transition-colors ${activeTab === 'manual'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 <div className="flex items-center space-x-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,11 +114,10 @@ const AddEquipmentPage: React.FC = () => {
               </button>
               <button
                 onClick={() => setActiveTab('excel')}
-                className={`py-4 px-8 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === 'excel'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`py-4 px-8 text-sm font-medium border-b-2 transition-colors ${activeTab === 'excel'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 <div className="flex items-center space-x-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,7 +138,7 @@ const AddEquipmentPage: React.FC = () => {
                 <h2 className="text-xl font-semibold text-gray-900">กรอกข้อมูลเครื่องมือ</h2>
                 <p className="text-sm text-gray-500 mt-1">กรุณากรอกข้อมูลให้ครบถ้วน (<span className="text-red-500">*</span> = จำเป็นต้องกรอก)</p>
               </div>
-              <EquipmentForm 
+              <EquipmentForm
                 onSubmit={handleFormSubmit}
                 onCancel={handleCancel}
               />

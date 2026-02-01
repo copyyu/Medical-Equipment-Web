@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import * as XLSX from 'xlsx';
-import type { ExcelData, ExcelUploadProps } from '../types/equipment';
+import type { ExcelData, ExcelUploadProps } from '../../types/equipment';
 
 const ExcelUpload: React.FC<ExcelUploadProps> = ({ onDataImport }) => {
   const [fileName, setFileName] = useState<string>('');
@@ -43,7 +43,7 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onDataImport }) => {
     const ws = XLSX.utils.json_to_sheet(template);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Template');
-    
+
     // ปรับความกว้างคอลัมน์
     const wscols = [
       { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 20 },
@@ -78,17 +78,17 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onDataImport }) => {
         idCode: row['รหัสอุปกรณ์'] || '',
         serialNo: row['หมายเลขเครื่อง'] || '',
         assessmentId: row['รหัสการประเมิน'] || '',
-        
+
         // Relations
         department: row['แผนก'] || '',
         category: row['หมวดหมู่'] || '',
         brand: row['ยี่ห้อ'] || '',
         model: row['รุ่น'] || '',
-        
+
         // Date & Price
         receiveDate: row['วันที่รับอุปกรณ์'] || '',
         purchasePrice: parseFloat(row['ราคาซื้อ']) || 0,
-        
+
         // Life Cycle
         lifeExpectancy: parseFloat(row['อายุการใช้งาน']) || 10,
         equipmentAge: parseFloat(row['อายุเครื่อง']) || 0,
@@ -96,13 +96,13 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onDataImport }) => {
         remainLife: parseFloat(row['อายุคงเหลือ']) || 0,
         usefulLifetimePercent: parseFloat(row['%การใช้งาน']) || 0,
         replacementYear: parseInt(row['ปีที่ต้องเปลี่ยน']) || 0,
-        
+
         // Assessment Scores
         technology: row['คะแนนเทคโนโลยี'] ? parseFloat(row['คะแนนเทคโนโลยี']) : null,
         usageStatistics: row['คะแนนสถิติการใช้งาน'] ? parseFloat(row['คะแนนสถิติการใช้งาน']) : null,
         efficiency: row['คะแนนประสิทธิภาพ'] ? parseFloat(row['คะแนนประสิทธิภาพ']) : null,
         others: row['หมายเหตุ'] || '',
-        
+
         // Excel-specific fields (optional)
         ecriRisk: row['ECRI Risk'] || '',
         classification: row['Classification'] || '',

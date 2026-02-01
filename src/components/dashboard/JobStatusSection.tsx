@@ -6,9 +6,9 @@ import {
     HiOutlineArrowUpTray
 } from 'react-icons/hi2'
 
-import { JOB_STATUS_CONFIG } from '../constants/mockData'
-import type { JobStatus } from '../types/status'
-import type { JobStatusCount, RecentJob } from '../types/dashboard'
+import { JOB_STATUS_CONFIG } from '../../constants/mockData'
+import type { JobStatus } from '../../types/status'
+import type { JobStatusCount, RecentJob } from '../../types/dashboard'
 
 interface JobStatusSectionProps {
     jobStatusData?: JobStatusCount[] | null

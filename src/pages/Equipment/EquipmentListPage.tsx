@@ -14,29 +14,11 @@ import {
 import EquipmentTable, { type EquipmentListItem } from '../../components/Table/EquipmentTable'
 import ViewEquipmentModal from '../../components/Modal/ViewEquipmentModal'
 import EditEquipmentModal from '../../components/Modal/EditEquipmentModal'
+import DeleteConfirmModal from '../../components/Modal/DeleteConfirmModal'
 
 // Hooks & API
 import { useEquipmentList } from '../../hooks/useEquipmentList'
-
-
-// Filter options - mapped to API status values (Asset Status)
-const STATUS_OPTIONS = [
-    { value: '', label: 'ทั้งหมด' },
-    { value: 'active', label: 'Active (ใช้งานอยู่)' },
-    { value: 'defective', label: 'Defective (ชำรุด)' },
-    { value: 'wait_decom', label: 'Wait Decom (รอปลดระวาง)' },
-    { value: 'decommission', label: 'Decommission (ปลดระวางแล้ว)' },
-    { value: 'active_ready_to_sell', label: 'Active-Ready to Sell (พร้อมขาย)' },
-    { value: 'missing', label: 'Missing (สูญหาย)' },
-    { value: 'plan_to_replace', label: 'Plan to Replace (รอเปลี่ยนใหม่)' }
-]
-
-const CATEGORY_OPTIONS = [
-    'ทั้งหมด',
-    'อุปกรณ์ทางการแพทย์',
-    'เครื่องปรับอากาศ',
-    'เครื่องมือแพทย์การแพทย์'
-]
+import { STATUS_OPTIONS, CATEGORY_OPTIONS } from '../../constants/equipmentOptions'
 
 export default function EquipmentListPage() {
     const navigate = useNavigate()
@@ -64,6 +46,7 @@ export default function EquipmentListPage() {
     const [selectedEquipment, setSelectedEquipment] = useState<EquipmentListItem | null>(null)
     const [isViewModalOpen, setIsViewModalOpen] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
     // Update API params when filters change
     useEffect(() => {
@@ -77,7 +60,8 @@ export default function EquipmentListPage() {
         }, 300) // Debounce search
 
         return () => clearTimeout(debounceTimer)
-    }, [searchTerm, statusFilter, setParams])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchTerm, statusFilter])
 
     // Filter by category locally (since API doesn't support it yet)
     const filteredEquipment = equipment.filter(item => {
@@ -85,9 +69,14 @@ export default function EquipmentListPage() {
         return matchesCategory
     })
 
-    // Page change handler
+    // Page change handler - preserve current search and status filters
     const handlePageChange = (newPage: number) => {
-        setParams({ page: newPage, limit: itemsPerPage })
+        setParams({
+            page: newPage,
+            limit: itemsPerPage,
+            search: searchTerm || undefined,
+            status: statusFilter || undefined
+        })
     }
 
     // Handlers
@@ -107,17 +96,17 @@ export default function EquipmentListPage() {
     }
 
     const handleSaveEdit = (updatedItem: EquipmentListItem) => {
-        // TODO: Call update API
-        console.log('Save edit:', updatedItem)
+        console.log('Saved:', updatedItem)
         refetch()
     }
 
     const handleDelete = (item: EquipmentListItem) => {
-        // TODO: Call delete API
-        if (confirm(`ต้องการลบอุปกรณ์ ${item.name} (${item.id}) หรือไม่?`)) {
-            console.log('Delete:', item.id)
-            refetch()
-        }
+        setSelectedEquipment(item)
+        setIsDeleteModalOpen(true)
+    }
+
+    const handleDeleted = () => {
+        refetch()
     }
 
     const handleAddEquipment = () => {
@@ -304,6 +293,13 @@ export default function EquipmentListPage() {
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
                 onSave={handleSaveEdit}
+            />
+
+            <DeleteConfirmModal
+                equipment={selectedEquipment}
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onDeleted={handleDeleted}
             />
         </div>
     )
