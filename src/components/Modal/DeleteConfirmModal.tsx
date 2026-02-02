@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { HiXMark, HiExclamationTriangle } from 'react-icons/hi2'
 import type { EquipmentListItem } from '../../types/equipment'
-import { deleteEquipment } from '../../service/equipmentApi'
+import { deleteEquipment } from '../../service/equipmentService'
 
 interface DeleteConfirmModalProps {
     equipment: EquipmentListItem | null

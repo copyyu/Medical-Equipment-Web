@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { EquipmentListItem } from '../types/equipment'
-import { fetchEquipmentList, type EquipmentListParams } from '../service/equipmentApi'
+import { fetchEquipmentList, type EquipmentListParams } from '../service/equipmentService'
 
 interface UseEquipmentListResult {
     data: EquipmentListItem[]

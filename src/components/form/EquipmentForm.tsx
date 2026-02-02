@@ -1,6 +1,7 @@
 // components/EquipmentForm.tsx
 import React, { useState } from 'react';
 import type { EquipmentFormData, EquipmentFormProps } from '../../types/equipment';
+import { createEquipment } from '../../service/equipmentService';
 
 const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => {
   const [formData, setFormData] = useState<EquipmentFormData>({
@@ -24,6 +25,9 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
     efficiency: null,
     others: ''
   });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -77,13 +81,69 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    setLoading(true);
+    setError(null);
+
+    try {
+      // เรียกใช้ service function
+      const result = await createEquipment(formData);
+
+      if (result.success) {
+        // แสดง success message
+        alert(`บันทึกข้อมูลสำเร็จ!\n\nรหัสอุปกรณ์: ${result.data.id_code}\nสถานะ: ${result.data.status}`);
+
+        // เรียก callback function ที่ส่งมาจาก parent
+        onSubmit(formData);
+
+        // Reset form
+        setFormData({
+          idCode: '',
+          serialNo: '',
+          assessmentId: '',
+          department: '',
+          brand: '',
+          model: '',
+          category: '',
+          receiveDate: '',
+          purchasePrice: 0,
+          equipmentAge: 0,
+          computeDate: '',
+          lifeExpectancy: 10,
+          remainLife: 0,
+          usefulLifetimePercent: 0,
+          replacementYear: 0,
+          technology: null,
+          usageStatistics: null,
+          efficiency: null,
+          others: ''
+        });
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการบันทึกข้อมูล';
+      setError(errorMessage);
+      console.error('Error submitting form:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start">
+          <svg className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+          </svg>
+          <div>
+            <p className="font-medium">เกิดข้อผิดพลาด</p>
+            <p className="text-sm mt-1">{error}</p>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* ID Code */}
         <div>
@@ -96,8 +156,9 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             value={formData.idCode}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="เช่น EQ-001"
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น EQ-2024-001"
           />
         </div>
 
@@ -112,7 +173,8 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             value={formData.serialNo}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
             placeholder="เช่น SN123456789"
           />
         </div>
@@ -127,7 +189,8 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             name="assessmentId"
             value={formData.assessmentId}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
             placeholder="เช่น ASSESS-2024-001"
           />
         </div>
@@ -143,8 +206,9 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             value={formData.department}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="เช่น Emergency Room"
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น Radiology"
           />
         </div>
 
@@ -159,8 +223,9 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             value={formData.category}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="เช่น X-Ray Machine"
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น MRI Scanner"
           />
         </div>
 
@@ -175,8 +240,9 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             value={formData.brand}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="เช่น Philips"
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น Siemens"
           />
         </div>
 
@@ -191,8 +257,9 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             value={formData.model}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="เช่น HC-5000"
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น MAGNETOM Sola"
           />
         </div>
 
@@ -207,7 +274,8 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             value={formData.receiveDate}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
         </div>
 
@@ -222,9 +290,11 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             value={formData.purchasePrice}
             onChange={handleNumberChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
             placeholder="0.00"
             step="0.01"
+            min="0"
           />
         </div>
 
@@ -238,11 +308,13 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             name="lifeExpectancy"
             value={formData.lifeExpectancy}
             onChange={handleNumberChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
             placeholder="10"
-            step="0.01"
+            step="0.1"
+            min="0"
           />
-          <p className="text-xs text-gray-500 mt-1">ถ้าผู้ใช้ตั้งค่ารุ่น เริ่ม 10 ปี</p>
+          <p className="text-xs text-gray-500 mt-1">ค่าเริ่มต้น 10 ปี</p>
         </div>
 
         {/* Calculate Age Button */}
@@ -250,7 +322,8 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
           <button
             type="button"
             onClick={calculateAge}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            disabled={loading || !formData.receiveDate}
+            className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-medium shadow-sm"
           >
             คำนวณอายุอุปกรณ์
           </button>
@@ -268,7 +341,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             type="number"
             value={formData.equipmentAge}
             readOnly
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
             step="0.01"
           />
           <p className="text-xs text-gray-500 mt-1">ปีปัจจุบัน - ปีรับเครื่อง</p>
@@ -283,7 +356,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             type="date"
             value={formData.computeDate}
             readOnly
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
           />
         </div>
 
@@ -296,7 +369,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             type="number"
             value={formData.remainLife}
             readOnly
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
             step="0.01"
           />
           <p className="text-xs text-gray-500 mt-1">อายุคาดหวัง - อายุเครื่อง</p>
@@ -311,7 +384,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             type="number"
             value={formData.usefulLifetimePercent}
             readOnly
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
             step="0.01"
           />
           <p className="text-xs text-gray-500 mt-1">(อายุเครื่อง / อายุคาดหวัง) × 100</p>
@@ -326,7 +399,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             type="number"
             value={formData.replacementYear}
             readOnly
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
           />
           <p className="text-xs text-gray-500 mt-1">ปีรับเครื่อง + อายุคาดหวัง</p>
         </div>
@@ -334,54 +407,57 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Technology Score */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            คะแนนเทคโนโลยี (0-100)
+            คะแนนเทคโนโลยี (0-5)
           </label>
           <input
             type="number"
             name="technology"
-            value={formData.technology || ''}
+            value={formData.technology ?? ''}
             onChange={handleNumberChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="0.00"
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="0.0"
             min="0"
-            max="100"
-            step="0.01"
+            max="5"
+            step="0.1"
           />
         </div>
 
         {/* Usage Statistics Score */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            คะแนนสถิติการใช้งาน (0-100)
+            คะแนนสถิติการใช้งาน (0-5)
           </label>
           <input
             type="number"
             name="usageStatistics"
-            value={formData.usageStatistics || ''}
+            value={formData.usageStatistics ?? ''}
             onChange={handleNumberChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="0.00"
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="0.0"
             min="0"
-            max="100"
-            step="0.01"
+            max="5"
+            step="0.1"
           />
         </div>
 
         {/* Efficiency Score */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            คะแนนประสิทธิภาพ (0-100)
+            คะแนนประสิทธิภาพ (0-5)
           </label>
           <input
             type="number"
             name="efficiency"
-            value={formData.efficiency || ''}
+            value={formData.efficiency ?? ''}
             onChange={handleNumberChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="0.00"
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="0.0"
             min="0"
-            max="100"
-            step="0.01"
+            max="5"
+            step="0.1"
           />
         </div>
 
@@ -394,27 +470,40 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             name="others"
             value={formData.others}
             onChange={handleChange}
+            disabled={loading}
             rows={4}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed resize-none"
             placeholder="ระบุรายละเอียดเพิ่มเติม..."
           />
         </div>
       </div>
 
       {/* Buttons */}
-      <div className="flex justify-end space-x-4 pt-4">
+      <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+          disabled={loading}
+          className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed font-medium"
         >
           ยกเลิก
         </button>
         <button
           type="submit"
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          disabled={loading}
+          className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed font-medium shadow-sm flex items-center min-w-[120px] justify-center"
         >
-          บันทึก
+          {loading ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              กำลังบันทึก...
+            </>
+          ) : (
+            <>บันทึก</>
+          )}
         </button>
       </div>
     </form>

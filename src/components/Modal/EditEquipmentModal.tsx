@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { HiXMark } from 'react-icons/hi2'
 import type { EquipmentListItem } from '../../types/equipment'
-import { updateEquipment } from '../../service/equipmentApi'
+import { updateEquipment } from '../../service/equipmentService'
 import { STATUS_OPTIONS_NO_ALL, CATEGORY_OPTIONS_NO_ALL } from '../../constants/equipmentOptions'
 
 interface EditEquipmentModalProps {

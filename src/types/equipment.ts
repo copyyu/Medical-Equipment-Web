@@ -1,5 +1,4 @@
-// ===== Equipment List Item (สำหรับตารางรายการอุปกรณ์) =====
-// Asset Status ตรงกับ Backend API: Active, Defective, Wait Decom, Decommission, Active-Ready to Sell, Missing, Plan to Replace
+// ===== Equipment Status =====
 export type EquipmentStatus =
   | 'active'
   | 'defective'
@@ -8,17 +7,6 @@ export type EquipmentStatus =
   | 'active_ready_to_sell'
   | 'missing'
   | 'plan_to_replace'
-
-export interface EquipmentListItem {
-  id: string
-  name: string
-  category: string
-  status: EquipmentStatus
-  location: string
-  lastCheck: string
-  expiry: string
-  isExpiring?: boolean  // flag ใกล้หมดอายุ (≤1 ปี)
-}
 
 export const EQUIPMENT_STATUS_CONFIG: Record<EquipmentStatus, { label: string; labelThai: string; bgColor: string; textColor: string }> = {
   active: { label: 'Active', labelThai: 'ใช้งานอยู่', bgColor: 'bg-emerald-100', textColor: 'text-emerald-700' },
@@ -30,99 +18,166 @@ export const EQUIPMENT_STATUS_CONFIG: Record<EquipmentStatus, { label: string; l
   plan_to_replace: { label: 'Plan to Replace', labelThai: 'รอเปลี่ยนใหม่', bgColor: 'bg-purple-100', textColor: 'text-purple-700' }
 }
 
-// ===== Equipment Form Data (สำหรับกรอกข้อมูล) =====
+export interface EquipmentListItem {
+  id: string
+  name: string
+  category: string
+  status: EquipmentStatus
+  location: string
+  lastCheck: string
+  expiry: string
+  isExpiring?: boolean
+}
+
 export interface EquipmentFormData {
-  // Basic Info
-  idCode: string;                    // ID CODE
-  serialNo: string;                  // Serial No
-  assessmentId: string;              // Assessment ID
 
-  // Relations (กรอกชื่อ - Backend จะแปลงเป็น ID)
-  department: string;                // Department name (Backend จะ find or create)
-  brand: string;                     // Brand name (Backend จะ find or create)
-  model: string;                     // Model name (Backend จะ find or create)
-  category: string;                  // Category name (Backend จะ find or create)
-
-  // Date & Price
-  receiveDate: string;               // Receive Date (ISO format: YYYY-MM-DD)
-  purchasePrice: number;             // Purchase price
-
-  // Life Cycle (Calculated Fields)
-  equipmentAge: number;              // Equipment Age (years)
-  computeDate: string;               // Compute Date (ISO format: YYYY-MM-DD)
-  lifeExpectancy: number;            // Life Expect (years)
-  remainLife: number;                // Remain Life (years)
-  usefulLifetimePercent: number;     // % of useful lifetime
-  replacementYear: number;           // Replacement Year
-
-  // Assessment Scores
-  technology: number | null;         // Technology (0-100)
-  usageStatistics: number | null;    // Usage Statistics (0-100)
-  efficiency: number | null;         // Efficiency (0-100)
-  others: string;                    // Others (notes)
-}
-
-// ===== Equipment Form Props =====
-export interface EquipmentFormProps {
-  onSubmit: (data: EquipmentFormData) => void;
-  onCancel: () => void;
-  initialData?: Partial<EquipmentFormData>;
-}
-
-// ===== Request =====
-export interface CreateEquipmentRequest {
   idCode: string;
   serialNo: string;
-  assessmentId?: string;
+  assessmentId: string;
 
   department: string;
   brand: string;
   model: string;
   category: string;
 
-  receiveDate: string;
+  receiveDate: string;            
   purchasePrice: number;
+
+  equipmentAge: number;
+  computeDate: string;              
   lifeExpectancy: number;
-  technology?: number;
-  usageStatistics?: number;
-  efficiency?: number;
+  remainLife: number;
+  usefulLifetimePercent: number;
+  replacementYear: number;
+
+  technology: number | null;
+  usageStatistics: number | null;
+  efficiency: number | null;
+  others: string;
+}
+
+export interface EquipmentFormProps {
+  onSubmit: (data: EquipmentFormData) => void;
+  onCancel: () => void;
+  initialData?: Partial<EquipmentFormData>;
+}
+
+export interface CreateEquipmentRequest {
+  id_code: string;
+  serial_no: string;
+  assessment_id?: string;
+  department: string;
+  brand: string;
+  model: string;
+  category: string;
+  receive_date: string;
+  purchase_price: number;
+  equipment_age: number;
+  compute_date?: string;
+  life_expectancy: number;
+  remain_life: number;
+  useful_lifetime_percent: number;
+  replacement_year?: number;
+  technology?: number | null;
+  usage_statistics?: number | null;
+  efficiency?: number | null;
   others?: string;
 }
 
-// ===== Response  =====
+export interface EquipmentUpdateRequest {
+  status?: string;
+  location?: string;
+  compute_date?: string;
+}
+
+export interface EquipmentResponse {
+  id: number;
+  id_code: string;
+  serial_no: string | null;
+  assessment_id: string | null;
+  status: string;
+  receive_date: string | null;
+  purchase_price: number;
+  equipment_age: number;
+  compute_date: string | null;
+  life_expectancy: number;
+  remain_life: number;
+  useful_lifetime_percent: number;
+  replacement_year: number | null;
+  technology: number | null;
+  usage_statistics: number | null;
+  efficiency: number | null;
+  others: string | null;
+  model: EquipmentModelDTO | null;
+  department: DepartmentDTO | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EquipmentDetailResponse {
+  id: string;
+  name: string;
+  category: string;
+  status: string;
+  location: string;
+  last_check: string;
+  expiry: string;
+  is_expiring: boolean;
+  serial_no: string;
+  brand: string;
+  department_id: number;
+}
+
+export interface EquipmentModelDTO {
+  id: number;
+  model_name: string;
+  default_life_expectancy: number;
+  brand: BrandDTO | null;
+  category: CategoryDTO | null;
+}
+
+export interface BrandDTO {
+  id: number;
+  brand_name: string;
+}
+
+export interface CategoryDTO {
+  id: number;
+  category_name: string;
+  risk_level: string;
+  description: string;
+}
+
+export interface DepartmentDTO {
+  id: number;
+  department_name: string;
+}
+
 export interface Equipment {
   id: number;
   idCode: string;
   serialNo: string;
   assessmentId: string | null;
-
   modelId: number;
   departmentId: number;
-
   model?: EquipmentModel;
   department?: Department;
-
   receiveDate: string | null;
   purchasePrice: number;
-
   equipmentAge: number;
   computeDate: string | null;
   lifeExpectancy: number;
   remainLife: number;
   usefulLifetimePercent: number;
   replacementYear: number | null;
-
   technology: number | null;
   usageStatistics: number | null;
   efficiency: number | null;
-
   others: string | null;
   createdAt: string;
   updatedAt: string;
-
   maintenanceRecords?: MaintenanceRecord[];
 }
-
 
 export interface Brand {
   id: number;
@@ -147,10 +202,8 @@ export interface EquipmentModel {
   modelName: string;
   defaultLifeExpectancy: number;
   specifications: string;
-
   brand?: Brand;
   category?: EquipmentCategory;
-
   createdAt: string;
   updatedAt: string;
 }
@@ -174,43 +227,7 @@ export interface MaintenanceRecord {
   updatedAt: string;
 }
 
-// ===== Excel Import Types =====
-export interface ExcelData {
-  // Basic Info
-  idCode: string;                    // ID CODE
-  serialNo: string;                  // Serial No
-  assessmentId: string;              // Assessment ID
-
-  // Relations (กรอกชื่อ - Backend จะแปลงเป็น ID)
-  department: string;                // Department name (Backend จะ find or create)
-  brand: string;                     // Brand name (Backend จะ find or create)
-  model: string;                     // Model name (Backend จะ find or create)
-  category: string;                  // Category name (Backend จะ find or create)
-
-  // Date & Price
-  receiveDate: string;               // Receive Date (ISO format: YYYY-MM-DD)
-  purchasePrice: number;             // Purchase price
-
-  // Life Cycle (Calculated Fields)
-  equipmentAge: number;              // Equipment Age (years)
-  computeDate: string;               // Compute Date (ISO format: YYYY-MM-DD)
-  lifeExpectancy: number;            // Life Expect (years)
-  remainLife: number;                // Remain Life (years)
-  usefulLifetimePercent: number;     // % of useful lifetime
-  replacementYear: number;           // Replacement Year
-
-  // Assessment Scores
-  technology: number | null;         // Technology (0-100)
-  usageStatistics: number | null;    // Usage Statistics (0-100)
-  efficiency: number | null;         // Efficiency (0-100)
-  others: string;                    // Others (notes)
-}
-
-export interface ExcelUploadProps {
-  onDataImport: (data: ExcelData[]) => void;
-}
-
-
+// ===== Maintenance =====
 export interface MaintenanceFormData {
   equipmentId: number;
   maintenanceType: 'CM' | 'PM';
@@ -220,7 +237,34 @@ export interface MaintenanceFormData {
   technician: string;
 }
 
+// ===== Excel Import =====
+export interface ExcelData {
+  idCode: string;
+  serialNo: string;
+  assessmentId: string;
+  department: string;
+  brand: string;
+  model: string;
+  category: string;
+  receiveDate: string;
+  purchasePrice: number;
+  equipmentAge: number;
+  computeDate: string;
+  lifeExpectancy: number;
+  remainLife: number;
+  usefulLifetimePercent: number;
+  replacementYear: number;
+  technology: number | null;
+  usageStatistics: number | null;
+  efficiency: number | null;
+  others: string;
+}
 
+export interface ExcelUploadProps {
+  onDataImport: (data: ExcelData[]) => void;
+}
+
+// ===== Statistics =====
 export interface EquipmentStats {
   totalEquipment: number;
   totalCost: number;

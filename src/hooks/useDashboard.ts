@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import type { DashboardSummary } from '../types/dashboard'
-import { fetchDashboardSummary } from '../service/dashboardApi'
+import { fetchDashboardSummary } from '../service/dashboardService'
 
 interface UseDashboardResult {
     data: DashboardSummary | null
