@@ -1,5 +1,6 @@
 // components/EquipmentForm.tsx
 import React, { useState } from 'react';
+import Swal from 'sweetalert2'; // ✅ อย่าลืม npm install sweetalert2
 import type { EquipmentFormData, EquipmentFormProps } from '../../types/equipment';
 import { createEquipment } from '../../service/equipmentService';
 
@@ -47,7 +48,18 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
   const calculateAge = () => {
     if (!formData.receiveDate) {
-      alert('กรุณาระบุวันที่รับอุปกรณ์ก่อน');
+      // 🔔 Alert แจ้งเตือน: กรณียังไม่ใส่วันที่
+      Swal.fire({
+        icon: 'warning',
+        title: 'แจ้งเตือน',
+        text: 'กรุณาระบุ "วันที่รับอุปกรณ์" ก่อนกดคำนวณครับ',
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#f59e0b', // สีส้ม
+        customClass: {
+          popup: 'rounded-xl',
+          confirmButton: 'rounded-lg px-6'
+        }
+      });
       return;
     }
 
@@ -91,37 +103,59 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
       const result = await createEquipment(formData);
 
       if (result.success) {
-        // แสดง success message
-        alert(`บันทึกข้อมูลสำเร็จ!\n\nรหัสอุปกรณ์: ${result.data.id_code}\nสถานะ: ${result.data.status}`);
+        // ✨ Alert สำเร็จ: แสดงข้อมูลสรุปสวยงาม
+        await Swal.fire({
+          title: 'บันทึกข้อมูลสำเร็จ!',
+          html: `
+            <div class="mt-2 p-4 bg-gray-50 rounded-lg text-left border border-gray-200">
+              <p class="mb-1 text-sm text-gray-600">รหัสอุปกรณ์:</p>
+              <p class="text-xl font-bold text-blue-600 mb-3">${result.data.id_code}</p>
+              <div class="flex items-center">
+                 <span class="text-sm text-gray-600 mr-2">สถานะ:</span>
+                 <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                   ${result.data.status}
+                 </span>
+              </div>
+            </div>
+          `,
+          icon: 'success',
+          confirmButtonText: 'ตกลง',
+          confirmButtonColor: '#2563eb', // สีฟ้า
+          timer: 3000,
+          timerProgressBar: true,
+          customClass: {
+            popup: 'rounded-2xl shadow-xl',
+            title: 'text-2xl font-bold text-gray-800'
+          }
+        });
 
         // เรียก callback function ที่ส่งมาจาก parent
         onSubmit(formData);
 
         // Reset form
         setFormData({
-          idCode: '',
-          serialNo: '',
-          assessmentId: '',
-          department: '',
-          brand: '',
-          model: '',
-          category: '',
-          receiveDate: '',
-          purchasePrice: 0,
-          equipmentAge: 0,
-          computeDate: '',
-          lifeExpectancy: 10,
-          remainLife: 0,
-          usefulLifetimePercent: 0,
-          replacementYear: 0,
-          technology: null,
-          usageStatistics: null,
-          efficiency: null,
-          others: ''
+          idCode: '', serialNo: '', assessmentId: '', department: '', brand: '', model: '', category: '',
+          receiveDate: '', purchasePrice: 0, equipmentAge: 0, computeDate: '', lifeExpectancy: 10,
+          remainLife: 0, usefulLifetimePercent: 0, replacementYear: 0, technology: null,
+          usageStatistics: null, efficiency: null, others: ''
         });
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการบันทึกข้อมูล';
+      
+      // ❌ Alert ผิดพลาด: แจ้งเตือนชัดเจน
+      Swal.fire({
+        icon: 'error',
+        title: 'บันทึกไม่สำเร็จ',
+        text: errorMessage,
+        confirmButtonText: 'ลองใหม่อีกครั้ง',
+        confirmButtonColor: '#ef4444', // สีแดง
+        customClass: {
+          popup: 'rounded-xl',
+          confirmButton: 'rounded-lg px-6'
+        }
+      });
+      
       setError(errorMessage);
       console.error('Error submitting form:', err);
     } finally {
@@ -131,14 +165,14 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Error Message */}
+      {/* Error Message (เก็บไว้แสดงผลหน้าจอด้วย เพื่อความชัดเจน) */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start">
+        <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-md shadow-sm flex items-start">
           <svg className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
           </svg>
           <div>
-            <p className="font-medium">เกิดข้อผิดพลาด</p>
+            <p className="font-bold">เกิดข้อผิดพลาด</p>
             <p className="text-sm mt-1">{error}</p>
           </div>
         </div>

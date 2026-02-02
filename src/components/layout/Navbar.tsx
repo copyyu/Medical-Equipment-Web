@@ -40,17 +40,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="hidden md:flex flex-1 max-w-md mx-8">
-          <div className="relative w-full group">
-            <HiOutlineMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-accent-500 transition-colors" />
-            <input
-              type="text"
-              placeholder="ค้นหาอุปกรณ์, ผู้ใช้..."
-              className="w-full py-2.5 pl-11 pr-4 bg-gray-100/80 border border-transparent rounded-xl text-sm placeholder-gray-400 focus:bg-white focus:border-gray-200 focus:ring-2 focus:ring-accent-100 transition-all outline-none"
-            />
-          </div>
-        </div>
 
         {/* Right Side */}
         <div className="flex items-center gap-3">
