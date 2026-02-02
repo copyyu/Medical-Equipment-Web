@@ -1,4 +1,4 @@
-import type { EquipmentListItem } from '../types/equipment'
+import type { CreateEquipmentRequest, EquipmentFormData, EquipmentListItem, EquipmentResponse } from '../types/equipment'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081'
 
@@ -64,6 +64,75 @@ function mapApiItemToFrontend(item: EquipmentApiItem): EquipmentListItem {
         expiry: item.expiry,
         isExpiring: item.is_expiring
     }
+}
+
+export function mapFormDataToRequest(formData: EquipmentFormData): CreateEquipmentRequest {
+  const request: CreateEquipmentRequest = {
+    // Required fields
+    id_code: formData.idCode,
+    serial_no: formData.serialNo,
+    department: formData.department,
+    brand: formData.brand,
+    model: formData.model,
+    category: formData.category,
+    receive_date: formData.receiveDate,
+    purchase_price: formData.purchasePrice,
+    equipment_age: formData.equipmentAge,
+    life_expectancy: formData.lifeExpectancy,
+    remain_life: formData.remainLife,
+    useful_lifetime_percent: formData.usefulLifetimePercent,
+  };
+
+  // Optional fields
+  if (formData.assessmentId) {
+    request.assessment_id = formData.assessmentId;
+  }
+  if (formData.computeDate) {
+    request.compute_date = formData.computeDate;
+  }
+  if (formData.replacementYear && formData.replacementYear > 0) {
+    request.replacement_year = formData.replacementYear;
+  }
+  if (formData.technology !== null && formData.technology !== undefined) {
+    request.technology = formData.technology;
+  }
+  if (formData.usageStatistics !== null && formData.usageStatistics !== undefined) {
+    request.usage_statistics = formData.usageStatistics;
+  }
+  if (formData.efficiency !== null && formData.efficiency !== undefined) {
+    request.efficiency = formData.efficiency;
+  }
+  if (formData.others) {
+    request.others = formData.others;
+  }
+
+  return request;
+}
+
+export function mapResponseToFormData(
+  response: EquipmentResponse
+): EquipmentFormData {
+  return {
+    idCode: response.id_code,
+    serialNo: response.serial_no || '',
+    assessmentId: response.assessment_id || '',
+    department: response.department?.department_name || '',
+    brand: response.model?.brand?.brand_name || '',
+    model: response.model?.model_name || '',
+    category: response.model?.category?.category_name || '',
+    receiveDate: response.receive_date ? response.receive_date.split('T')[0] : '',
+    purchasePrice: response.purchase_price || 0,
+    equipmentAge: response.equipment_age || 0,
+    computeDate: response.compute_date ? response.compute_date.split('T')[0] : '',
+    lifeExpectancy: response.life_expectancy || 10,
+    remainLife: response.remain_life || 0,
+    usefulLifetimePercent: response.useful_lifetime_percent || 0,
+    replacementYear: response.replacement_year || 0,
+    technology: response.technology,
+    usageStatistics: response.usage_statistics,
+    efficiency: response.efficiency,
+    others: response.others || '',
+  };
 }
 
 export async function fetchEquipmentList(params: EquipmentListParams = {}): Promise<{
@@ -167,4 +236,34 @@ export async function getEquipmentById(id: string): Promise<EquipmentListItem> {
     }
 
     return mapApiItemToFrontend(result.data)
+}
+
+export async function createEquipment(
+  formData: EquipmentFormData
+): Promise<ApiResponse<EquipmentResponse>> {
+  const requestData = mapFormDataToRequest(formData);
+
+  const url = `${BASE_URL}/api/equipment`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ 
+      message: `HTTP error! status: ${response.status}` 
+    }));
+    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+  }
+
+  const result: ApiResponse<EquipmentResponse> = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.message || 'Failed to create equipment');
+  }
+
+  return result;
 }
