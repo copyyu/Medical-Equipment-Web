@@ -12,6 +12,7 @@ export type { EquipmentListItem } from '../../types/equipment'
 // Props interface
 interface EquipmentTableProps {
     data: EquipmentListItem[]
+    total?: number // จำนวนทั้งหมดจาก API (ใช้แสดง "พบ X อุปกรณ์")
     onView: (item: EquipmentListItem) => void
     onEdit: (item: EquipmentListItem) => void
     onDelete?: (item: EquipmentListItem) => void
@@ -28,13 +29,13 @@ const getExpiryStatus = (expiryDate: string) => {
     return 'ok'
 }
 
-export default function EquipmentTable({ data, onView, onEdit, onDelete }: EquipmentTableProps) {
+export default function EquipmentTable({ data, total, onView, onEdit, onDelete }: EquipmentTableProps) {
     return (
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             {/* Header with count */}
             <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <p className="text-sm text-gray-600">
-                    พบ <span className="font-semibold text-gray-900">{data.length}</span> อุปกรณ์
+                    พบ <span className="font-semibold text-gray-900">{total ?? data.length}</span> อุปกรณ์
                 </p>
             </div>
 

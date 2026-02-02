@@ -235,6 +235,7 @@ export default function EquipmentListPage() {
             {!isLoading && (
                 <EquipmentTable
                     data={filteredEquipment}
+                    total={total}
                     onView={handleView}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
