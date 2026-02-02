@@ -1,4 +1,3 @@
-// ===== Equipment Status =====
 export type EquipmentStatus =
   | 'active'
   | 'defective'
@@ -30,7 +29,7 @@ export interface EquipmentListItem {
 }
 
 export interface EquipmentFormData {
-
+  // Basic Info
   idCode: string;
   serialNo: string;
   assessmentId: string;
@@ -40,7 +39,8 @@ export interface EquipmentFormData {
   model: string;
   category: string;
 
-  receiveDate: string;            
+  // Date & Price
+  receiveDate: string;              
   purchasePrice: number;
 
   equipmentAge: number;
@@ -227,7 +227,6 @@ export interface MaintenanceRecord {
   updatedAt: string;
 }
 
-// ===== Maintenance =====
 export interface MaintenanceFormData {
   equipmentId: number;
   maintenanceType: 'CM' | 'PM';
@@ -237,7 +236,6 @@ export interface MaintenanceFormData {
   technician: string;
 }
 
-// ===== Excel Import =====
 export interface ExcelData {
   idCode: string;
   serialNo: string;
@@ -258,13 +256,30 @@ export interface ExcelData {
   usageStatistics: number | null;
   efficiency: number | null;
   others: string;
+  ecriRisk?: string;
+  classification?: string;
+  totalCM?: number;
+  totalCost?: number;
+  perCostPrice?: number;
 }
 
 export interface ExcelUploadProps {
-  onDataImport: (data: ExcelData[]) => void;
+  onImportComplete?: () => void;
 }
 
-// ===== Statistics =====
+export interface EquipmentImportResult {
+  total_rows: number;
+  success_count: number;
+  failed_count: number;
+  skipped_count: number;
+  new_brands: number;
+  new_categories: number;
+  new_departments: number;
+  new_models: number;
+  failed_rows: number[];
+  error_messages: string[];
+}
+
 export interface EquipmentStats {
   totalEquipment: number;
   totalCost: number;

@@ -1,4 +1,4 @@
-import type { CreateEquipmentRequest, EquipmentFormData, EquipmentListItem, EquipmentResponse } from '../types/equipment'
+import type { CreateEquipmentRequest, EquipmentFormData, EquipmentImportResult, EquipmentListItem, EquipmentResponse } from '../types/equipment'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081'
 
@@ -267,3 +267,73 @@ export async function createEquipment(
 
   return result;
 }
+
+export async function importExcelFile(
+  file: File
+): Promise<ApiResponse<EquipmentImportResult>> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const url = `${BASE_URL}/import`;
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData, 
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ 
+      message: `HTTP error! status: ${response.status}` 
+    }));
+    throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
+  }
+
+  const result = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.message || result.error || 'Failed to import Excel file');
+  }
+
+  return result;
+}
+
+// export async function importExcelBatch(
+//   files: File[]
+// ): Promise<ApiResponse<{
+//   files_count: number;
+//   total_success: number;
+//   total_failed: number;
+//   results: Array<{
+//     filename: string;
+//     success: boolean;
+//     data?: EquipmentImportResult;
+//     error?: string;
+//   }>;
+// }>> {
+//   const formData = new FormData();
+  
+//   // เพิ่มไฟล์ทั้งหมดด้วย key "files"
+//   files.forEach(file => {
+//     formData.append('files', file);
+//   });
+
+//   const url = `${BASE_URL}/api/import/batch`;
+//   const response = await fetch(url, {
+//     method: 'POST',
+//     body: formData,
+//   });
+
+//   if (!response.ok) {
+//     const errorData = await response.json().catch(() => ({ 
+//       message: `HTTP error! status: ${response.status}` 
+//     }));
+//     throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
+//   }
+
+//   const result = await response.json();
+
+//   if (!result.success) {
+//     throw new Error(result.message || result.error || 'Failed to import Excel files');
+//   }
+
+//   return result;
+// }
