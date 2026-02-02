@@ -805,3 +805,82 @@ h6 {
   left: 50%;
   animation: float 12s ease-in-out infinite;
 }
+
+/* ============================================
+   Login Page – Cute & Subtle Animations
+   (ADD-ON ONLY, no override existing styles)
+   ============================================ */
+
+/* Fade + Slide up for card */
+@keyframes login-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-login-card {
+  animation: login-fade-up 0.45s ease-out both;
+}
+
+/* Error shake (soft, not aggressive) */
+@keyframes login-shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+
+.animate-login-error {
+  animation: login-shake 0.35s ease-in-out;
+}
+
+/* Logo floating (cute enterprise-safe) */
+@keyframes login-logo-float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.03);
+  }
+}
+
+.animate-login-logo {
+  animation: login-logo-float 4s ease-in-out infinite;
+}
+
+/* Button press feedback */
+.login-btn {
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.login-btn:active {
+  transform: scale(0.97);
+}
+
+/* Input focus glow (soft premium) */
+.login-input:focus {
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+/* Error text fade in */
+@keyframes login-error-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-login-error-text {
+  animation: login-error-fade 0.25s ease-out;
+}
