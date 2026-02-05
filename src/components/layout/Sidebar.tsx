@@ -16,7 +16,7 @@ const menuItems = [
   { path: '/home', icon: HiOutlineHome, label: 'Dashboard' },
   { path: '/equipment', icon: HiOutlineClipboardDocumentList, label: 'รายการอุปกรณ์' },
   { path: '/add-equipment', icon: HiOutlineCube, label: 'เพิ่มอุปกรณ์การแพทย์' },
-  { path: '/rent', icon: HiOutlineUsers, label: 'เช่ายืม' },
+  //{ path: '/rent', icon: HiOutlineUsers, label: 'เช่ายืม' },
   { path: '/ticket', icon: HiOutlineChatBubbleLeftRight, label: 'Ticket' },
   // { path: '/reports', icon: HiOutlineChartBar, label: 'รายงาน' },
   // { path: '/settings', icon: HiOutlineCog6Tooth, label: 'ตั้งค่า' },

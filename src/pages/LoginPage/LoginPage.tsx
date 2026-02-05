@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
-import Logo from '../../assets/logo.jpg';
+import Logo from '../../assets/Logo.png';
 
 export default function LoginPage() {
   const navigate = useNavigate();

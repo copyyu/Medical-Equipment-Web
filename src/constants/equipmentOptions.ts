@@ -32,3 +32,57 @@ export const CATEGORY_OPTIONS = [
 
 // Category options without "All" (for edit forms)
 export const CATEGORY_OPTIONS_NO_ALL = CATEGORY_OPTIONS.filter(cat => cat !== 'ทั้งหมด')
+
+// ✅✅ เพิ่มส่วนนี้เข้าไปครับ เพื่อให้ Table รู้ว่าจะแสดงสีอะไร ✅✅
+export const EQUIPMENT_STATUS_CONFIG = {
+    active: {
+        label: 'Active',
+        labelThai: 'ใช้งานอยู่',
+        color: 'emerald',
+        bgColor: 'bg-emerald-100',
+        textColor: 'text-emerald-700',
+    },
+    defective: {
+        label: 'Defective',
+        labelThai: 'ชำรุด',
+        color: 'red',
+        bgColor: 'bg-red-100',
+        textColor: 'text-red-700',
+    },
+    wait_decom: {
+        label: 'Wait Decom',
+        labelThai: 'รอปลดระวาง',
+        color: 'orange',
+        bgColor: 'bg-orange-100',
+        textColor: 'text-orange-700',
+    },
+    decommission: {
+        label: 'Decommissioned',
+        labelThai: 'ปลดระวางแล้ว',
+        color: 'gray',
+        bgColor: 'bg-gray-100',
+        textColor: 'text-gray-600',
+    },
+    active_ready_to_sell: {
+        label: 'Ready to Sell',
+        labelThai: 'พร้อมขาย',
+        color: 'blue',
+        bgColor: 'bg-blue-100',
+        textColor: 'text-blue-700',
+    },
+    missing: {
+        label: 'Missing',
+        labelThai: 'สูญหาย',
+        color: 'gray',
+        bgColor: 'bg-gray-200',
+        textColor: 'text-gray-800',
+    },
+    // สถานะสำหรับเครื่องที่หมดอายุ (Backend จะส่ง status นี้มาเมื่อ remain_life <= 0)
+    plan_to_replace: {
+        label: 'Plan to Replace',
+        labelThai: 'รอเปลี่ยนใหม่/หมดอายุ',
+        color: 'red',
+        bgColor: 'bg-red-50', 
+        textColor: 'text-red-700 border border-red-200', // เพิ่มขอบแดงให้ดูเด่นว่าเป็นของหมดอายุ
+    }
+}
