@@ -1,5 +1,5 @@
 import { HiXMark } from 'react-icons/hi2'
-import { EQUIPMENT_STATUS_CONFIG, type EquipmentListItem } from '../../types/equipment'
+import { EQUIPMENT_STATUS_CONFIG, type EquipmentListItem, type EquipmentStatus } from '../../types/equipment'
 
 interface ViewEquipmentModalProps {
     equipment: EquipmentListItem | null
@@ -11,7 +11,13 @@ interface ViewEquipmentModalProps {
 export default function ViewEquipmentModal({ equipment, isOpen, onClose, onEdit }: ViewEquipmentModalProps) {
     if (!isOpen || !equipment) return null
 
-    const statusConfig = EQUIPMENT_STATUS_CONFIG[equipment.status]
+    const statusKey = equipment.status as EquipmentStatus
+    const statusConfig = EQUIPMENT_STATUS_CONFIG[statusKey] || {
+        label: equipment.status,
+        labelThai: equipment.status,
+        bgColor: 'bg-gray-100',
+        textColor: 'text-gray-700'
+    }
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">

@@ -40,33 +40,7 @@ const AddEquipmentPage: React.FC = () => {
     }
   };
 
-  // ฟังก์ชันสำหรับนำเข้าข้อมูลจาก Excel
-  const handleExcelImport = async (data: EquipmentFormData[]) => {
-    try {
-      // TODO: เรียก API เพื่อบันทึกข้อมูลแบบ bulk
-      console.log('Excel data to import:', data);
 
-      // จำลองการเรียก API
-      // const response = await fetch('/api/equipment/bulk', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ items: data })
-      // });
-
-      // แสดงข้อความสำเร็จ
-      setSuccessMessage(`นำเข้าข้อมูลสำเร็จ ${data.length} รายการ`);
-      setShowSuccessModal(true);
-
-      // ซ่อนข้อความหลัง 3 วินาที
-      setTimeout(() => {
-        setShowSuccessModal(false);
-      }, 3000);
-
-    } catch (error) {
-      console.error('Error importing data:', error);
-      alert('เกิดข้อผิดพลาดในการนำเข้าข้อมูล');
-    }
-  };
 
   const handleCancel = () => {
     // TODO: กลับไปหน้าก่อนหน้า หรือ redirect ไปหน้ารายการอุปกรณ์
@@ -149,7 +123,11 @@ const AddEquipmentPage: React.FC = () => {
                 <h2 className="text-xl font-semibold text-gray-900">นำเข้าข้อมูลจาก Excel</h2>
                 <p className="text-sm text-gray-500 mt-1">ดาวน์โหลด Template และกรอกข้อมูลให้ครบถ้วนก่อนนำเข้า</p>
               </div>
-              <ExcelUpload onDataImport={handleExcelImport} />
+              <ExcelUpload onImportComplete={() => {
+                setSuccessMessage('นำเข้าข้อมูลสำเร็จ');
+                setShowSuccessModal(true);
+                setTimeout(() => setShowSuccessModal(false), 3000);
+              }} />
             </div>
           )}
         </div>

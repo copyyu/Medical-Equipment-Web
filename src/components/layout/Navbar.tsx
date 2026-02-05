@@ -2,7 +2,6 @@ import { useState } from 'react'
 import {
   HiOutlineBell,
   HiOutlineUser,
-  HiOutlineMagnifyingGlass,
   HiOutlineCog6Tooth,
   HiOutlineArrowRightOnRectangle,
   HiOutlineChevronDown

@@ -84,7 +84,7 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
       // แปลงข้อมูลให้ตรงกับ ExcelData type
-      const mappedData: ExcelData[] = jsonData.map((row: any, index) => {
+      const mappedData: ExcelData[] = jsonData.map((row: any) => {
         const mapped: ExcelData = {
           // Basic Info - รองรับทั้งภาษาไทยและอังกฤษ
           idCode: getColumnValue(row, 'รหัสอุปกรณ์', 'ID CODE'),
@@ -137,10 +137,10 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
   // Parse Excel date to YYYY-MM-DD
   const parseExcelDate = (dateValue: any): string => {
     if (!dateValue) return '';
-    
+
     // ถ้าเป็น "-" ให้คืนค่าว่าง
     if (dateValue === '-') return '';
-    
+
     // If already in YYYY-MM-DD format
     if (typeof dateValue === 'string' && dateValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
       return dateValue;
