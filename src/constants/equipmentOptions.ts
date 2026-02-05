@@ -52,9 +52,9 @@ export const EQUIPMENT_STATUS_CONFIG = {
     wait_decom: {
         label: 'Wait Decom',
         labelThai: 'รอปลดระวาง',
-        color: 'orange',
-        bgColor: 'bg-orange-100',
-        textColor: 'text-orange-700',
+        color: 'amber',
+        bgColor: 'bg-amber-50',
+        textColor: 'text-amber-600',
     },
     decommission: {
         label: 'Decommissioned',
@@ -73,16 +73,16 @@ export const EQUIPMENT_STATUS_CONFIG = {
     missing: {
         label: 'Missing',
         labelThai: 'สูญหาย',
-        color: 'gray',
-        bgColor: 'bg-gray-200',
-        textColor: 'text-gray-800',
+        color: 'orange',
+        bgColor: 'bg-orange-50',
+        textColor: 'text-orange-600',
     },
     // สถานะสำหรับเครื่องที่หมดอายุ (Backend จะส่ง status นี้มาเมื่อ remain_life <= 0)
     plan_to_replace: {
         label: 'Plan to Replace',
-        labelThai: 'รอเปลี่ยนใหม่/หมดอายุ',
-        color: 'red',
-        bgColor: 'bg-red-50', 
-        textColor: 'text-red-700 border border-red-200', // เพิ่มขอบแดงให้ดูเด่นว่าเป็นของหมดอายุ
+        labelThai: 'รอเปลี่ยนใหม่',
+        color: 'purple',
+        bgColor: 'bg-purple-50',
+        textColor: 'text-purple-600',
     }
 }
