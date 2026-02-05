@@ -178,6 +178,7 @@ export interface EquipmentUpdateRequest {
     status?: string
     location?: string
     compute_date?: string
+    expiry_date?: string  // วันหมดอายุ - Backend จะคำนวณ remain_life ใหม่
 }
 
 // Update equipment by ID

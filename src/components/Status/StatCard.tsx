@@ -68,11 +68,11 @@ function createStats(data: StatCardData): StatItem[] {
         },
         {
             icon: HiOutlineArrowsRightLeft,
-            label: 'อุปกรณ์เช่ายืม',
+            label: 'หมดอายุ',
             rawValue: data.rentalEquipment,
             change: '+15%',
             isUp: true,
-            gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+            gradient: 'linear-gradient(135deg, #ff0000ff 0%, #ff0000ff 100%)'
         },
         {
             icon: HiOutlineExclamationTriangle,
