@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import authService from '../service/authService';
 import type { AuthState, LoginCredentials, User } from '../types/auth';
-import { clearAuthData, getToken, getUser, setToken, setUser } from '../utills/auth';
+import { clearAuthData, getToken, getUser, setToken, setUser } from '../utils/auth';
 
 interface AuthStore extends AuthState {
   token: string | null;
@@ -24,7 +24,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await authService.login(credentials);
-      
+
       // Save to localStorage
       setToken(response.token);
       setUser(response.admin);
@@ -54,7 +54,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   logout: async () => {
     set({ isLoading: true });
     const currentToken = get().token || getToken();
-    
+
     try {
       if (currentToken) {
         await authService.logout(currentToken);
@@ -64,7 +64,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     } finally {
       // Clear all auth data
       clearAuthData();
-      
+
       // Reset store
       set({
         user: null,
@@ -79,7 +79,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   // Check if user is authenticated (on app init)
   checkAuth: () => {
     set({ isLoading: true });
-    
+
     try {
       const token = getToken();
       const user = getUser();
