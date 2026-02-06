@@ -41,7 +41,8 @@ export default function EditEquipmentModal({ equipment, isOpen, onClose, onSave 
             await updateEquipment(formData.id, {
                 status: formData.status,
                 location: formData.location,
-                compute_date: formData.lastCheck
+                compute_date: formData.lastCheck,
+                expiry_date: formData.expiry  // ส่งวันหมดอายุเพื่อคำนวณ remain_life ใหม่
             })
 
             onSave(formData)

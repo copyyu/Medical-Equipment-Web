@@ -106,7 +106,7 @@ function StatCardItem({ stat, index }: { stat: StatItem, index: number }) {
                 <div className="flex items-center gap-2 mt-4 pt-3 border-t border-white/10">
                     <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold backdrop-blur-sm bg-white/20 text-white`}>
                         {stat.isUp ? <HiOutlineArrowTrendingUp className="w-3 h-3" /> : <HiOutlineArrowTrendingDown className="w-3 h-3" />}
-                        <span>{stat.isUp ? '+ เพิ่มขึ้น' : '- ลดลง'}</span> 
+                        <span>{stat.isUp ? '+ เพิ่มขึ้น' : '- ลดลง'}</span>
                     </div>
                     <span className="text-xs text-white/70 ml-auto flex items-center gap-1">
                         <HiOutlineClock className="w-3 h-3" /> {stat.trendValue}
@@ -118,7 +118,7 @@ function StatCardItem({ stat, index }: { stat: StatItem, index: number }) {
 }
 
 export default function StatCard({ data, isLoading = false }: StatCardProps) {
-    
+
     const stats = useMemo<StatItem[]>(() => {
         const safeData = data ?? {
             totalEquipment: 0,
@@ -143,7 +143,7 @@ export default function StatCard({ data, isLoading = false }: StatCardProps) {
                 label: 'หมดอายุการใช้งาน',
                 rawValue: safeData.expiredEquipment,
                 trendValue: 'ควรจำหน่ายออก',
-                isUp: false, 
+                isUp: false,
                 gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', // Red
                 shadowColor: 'rgba(220, 38, 38, 0.3)'
             },

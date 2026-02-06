@@ -21,7 +21,7 @@ export interface EquipmentListItem {
   id: string
   name: string
   category: string
-  status: EquipmentStatus
+  status: string  // Changed to string to match API response
   location: string
   lastCheck: string
   expiry: string
@@ -40,11 +40,11 @@ export interface EquipmentFormData {
   category: string;
 
   // Date & Price
-  receiveDate: string;              
+  receiveDate: string;
   purchasePrice: number;
 
   equipmentAge: number;
-  computeDate: string;              
+  computeDate: string;
   lifeExpectancy: number;
   remainLife: number;
   usefulLifetimePercent: number;

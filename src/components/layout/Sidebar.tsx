@@ -4,10 +4,7 @@ import {
   HiOutlineHome,
   HiOutlineCube,
   HiOutlineClipboardDocumentList,
-  HiOutlineUsers,
   HiOutlineChatBubbleLeftRight,
-  // HiOutlineChartBar,
-  // HiOutlineCog6Tooth,
   HiOutlineChevronLeft,
   HiOutlineChevronRight
 } from 'react-icons/hi2'
