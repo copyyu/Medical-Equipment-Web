@@ -12,7 +12,7 @@ interface RequestTableProps {
 export default function TicketTable({ data, onView, onEdit, onDelete }: RequestTableProps) {
   const getStatusIcon = (status: RequestItem['status']) => {
     switch (status) {
-      case 'in_progress': return AlertCircle;
+      case 'in_process': return AlertCircle;
       case 'return_equipment_back': return CheckCircle;
       case 'send_to_outsource': return Clock;
       default: return AlertCircle;

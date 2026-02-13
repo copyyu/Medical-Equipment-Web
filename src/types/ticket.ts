@@ -1,4 +1,4 @@
-export type TicketStatus = 'in_progress' | 'return_equipment_back' | 'send_to_outsource';
+export type TicketStatus = 'in_process' | 'return_equipment_back' | 'send_to_outsource';
 
 export type TicketPriority = 'low' | 'medium' | 'high' | 'urgent';
 
@@ -8,8 +8,8 @@ export const ticketStatusConfig: Record<TicketStatus, {
     label: string;
     color: string;
 }> = {
-    in_progress: {
-        label: 'In Progress',
+    in_process: {
+        label: 'in Process',
         color: 'bg-blue-100 text-blue-700 border-blue-300'
     },
     return_equipment_back: {
@@ -146,7 +146,7 @@ export interface TicketHistory {
 // Ticket Stats
 export interface TicketStats {
     total: number;
-    inProgress: number;
+    in_process: number;
     completed: number;
     sendToOutsource: number;
 }

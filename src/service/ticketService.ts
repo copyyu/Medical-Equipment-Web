@@ -120,7 +120,7 @@ export interface TicketDetailApiResponse {
 
 export interface TicketStatsApiResponse {
     total: number;
-    in_progress: number;
+    in_process: number;
     completed: number;
     send_to_outsource: number;
 }
@@ -137,11 +137,11 @@ export interface TicketListParams {
 
 function mapApiStatusToFrontend(status: string): TicketStatus {
     const statusMap: Record<string, TicketStatus> = {
-        'in_progress': 'in_progress',
+        'in_process': 'in_process',
         'return_equipment_back': 'return_equipment_back',
         'send_to_outsource': 'send_to_outsource'
     };
-    return statusMap[status] || 'in_progress';
+    return statusMap[status] || 'in_process';
 }
 
 function mapApiPriorityToFrontend(priority: string): TicketPriority {
@@ -289,7 +289,7 @@ export async function fetchTicketStats(): Promise<TicketStats> {
 
     return {
         total: result.data.total,
-        inProgress: result.data.in_progress,
+        in_process: result.data.in_process,
         completed: result.data.completed,
         sendToOutsource: result.data.send_to_outsource
     };
