@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 
 import type { RequestItem } from '../../types/status';
+import type { TicketListItem, TicketType, TicketStats } from '../../types/ticket';
 import TicketTable from '../../components/Table/TicketTable';
 import FilterBar from '../../components/filter/FilterBar';
 import TicketStatCard from '../../components/Status/TicketStatCard';
 import ViewRequestModal from '../../components/Modal/ViewRequestModal';
 import EditRequestModal from '../../components/Modal/EditRequestModal';
-import { mockRequests } from '../../constants/mockData';
+import { fetchTicketList, fetchTicketStats } from '../../service/ticketService';
 
 export default function TicketPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,38 +19,131 @@ export default function TicketPage() {
   const [viewingRequest, setViewingRequest] = useState<RequestItem | null>(null);
   const [editingRequest, setEditingRequest] = useState<RequestItem | null>(null);
 
-  const filteredData = mockRequests.filter((item) => {
-    const matchesSearch =
-      item.requestNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.equipmentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.requesterName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesType = selectedType === 'all' || item.requestType === selectedType;
-    const matchesStatus = selectedStatus === 'all' || item.status === selectedStatus;
-    const matchesPriority = selectedPriority === 'all' || item.priority === selectedPriority;
-
-    return matchesSearch && matchesType && matchesStatus && matchesPriority;
+  // API State
+  const [tickets, setTickets] = useState<TicketListItem[]>([]);
+  const [categories, setCategories] = useState<Array<{ id: number; name: string }>>([]);
+  const [stats, setStats] = useState<TicketStats>({
+    total: 0,
+    inProgress: 0,
+    completed: 0,
+    sendToOutsource: 0,
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+
+  // Fetch tickets from API
+  const loadTickets = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const result = await fetchTicketList({
+        page,
+        limit: 10,
+        status: selectedStatus !== 'all' ? selectedStatus : undefined,
+        priority: selectedPriority !== 'all' ? selectedPriority : undefined,
+        search: searchTerm || undefined,
+        sort_by: 'created_at',
+        sort_dir: 'desc'
+      });
+
+      setTickets(result.data);
+
+      setTotalPages(result.totalPages);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load tickets');
+      console.error('Error loading tickets:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTickets();
+  }, [page, selectedStatus, selectedPriority, searchTerm]);
+
+  // Fetch stats from API
+  const loadStats = async () => {
+    try {
+      const result = await fetchTicketStats();
+      setStats(result);
+    } catch (err) {
+      console.error('Error loading stats:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  // Convert TicketListItem to RequestItem for compatibility with existing components
+  const convertToRequestItem = (ticket: TicketListItem): RequestItem => {
+    // Format date to Thai format
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('th-TH', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    };
+
+    // Try to find category ID from name if missing
+    let catId = ticket.categoryId;
+    if (!catId && ticket.categoryName && categories.length > 0) {
+      const found = categories.find(c => c.name === ticket.categoryName);
+      if (found) catId = found.id;
+    }
+
+    return {
+      id: ticket.id.toString(),
+      requestNumber: ticket.ticketNo,
+      equipmentName: ticket.equipmentName || 'N/A',
+      equipmentSerial: ticket.equipmentIdCode || '-',
+      requesterName: ticket.reporterName,
+      department: ticket.departmentName || '-',
+      description: ticket.description || '',
+      requestType: getTicketType(ticket.categoryName),
+      categoryId: catId,
+      requestDate: formatDate(ticket.reportedAt),
+      status: ticket.status,
+      priority: ticket.priority,
+      assignedTo: '-',
+      createdAt: ticket.createdAt,
+      updatedAt: ticket.createdAt,
+    };
+  };
+
+  const getTicketType = (categoryName: string): TicketType => {
+    if (!categoryName) return 'other';
+    const lowerName = categoryName.toLowerCase();
+    if (lowerName.includes('ซ่อม') || lowerName === 'repair') return 'repair';
+    if (lowerName.includes('บำรุง') || lowerName === 'maintenance') return 'maintenance';
+    if (lowerName.includes('สอบถาม') || lowerName.includes('ใช้งาน') || lowerName === 'inspection') return 'inspection';
+    return 'other';
+  };
+
+
+  const filteredData = tickets.map(convertToRequestItem);
 
   const clearFilters = () => {
     setSelectedType('all');
     setSelectedStatus('all');
     setSelectedPriority('all');
     setSearchTerm('');
+    setPage(1);
   };
 
   const hasActiveFilters = selectedType !== 'all' || selectedStatus !== 'all' || selectedPriority !== 'all' || searchTerm !== '';
-
-  const stats = {
-    total: mockRequests.length,
-    pending: mockRequests.filter(i => i.status === 'pending').length,
-    inProgress: mockRequests.filter(i => i.status === 'in-progress').length,
-    completed: mockRequests.filter(i => i.status === 'completed').length,
-  };
-
-  const handleSave = (updatedRequest: RequestItem) => {
-    console.log('Saving request:', updatedRequest);
+  const handleSave = async (updatedRequest: RequestItem) => {
+    console.log('handleSave called with:', updatedRequest);
+    // EditRequestModal already calls updateTicket API, so we just refresh data here
+    toast.success(`Ticket updated successfully`);
+    loadTickets();
+    loadStats();
   };
 
   return (
@@ -58,12 +153,7 @@ export default function TicketPage() {
         <p className="text-sm text-gray-500">จัดการคำขอจากผู้ใช้ เช่น แจ้งซ่อม แจ้งเปลี่ยน และบำรุงรักษาอุปกรณ์</p>
       </div>
 
-      <TicketStatCard
-        total={stats.total}
-        pending={stats.pending}
-        inProgress={stats.inProgress}
-        completed={stats.completed}
-      />
+      <TicketStatCard stats={stats} />
 
       <FilterBar
         searchTerm={searchTerm}
@@ -80,11 +170,51 @@ export default function TicketPage() {
         clearFilters={clearFilters}
       />
 
-      <TicketTable
-        data={filteredData}
-        onView={setViewingRequest}
-        onEdit={setEditingRequest}
-      />
+      {loading && (
+        <div className="text-center py-8">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <p className="mt-2 text-gray-600">กำลังโหลดข้อมูล...</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+          <p className="font-semibold">เกิดข้อผิดพลาด</p>
+          <p className="text-sm">{error}</p>
+        </div>
+      )}
+
+      {!loading && !error && (
+        <>
+          <TicketTable
+            data={filteredData}
+            onView={setViewingRequest}
+            onEdit={setEditingRequest}
+          />
+
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-6">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-4 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                ← ก่อนหน้า
+              </button>
+              <span className="text-sm text-gray-600">
+                หน้า {page} จาก {totalPages}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="px-4 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                ถัดไป →
+              </button>
+            </div>
+          )}
+        </>
+      )}
 
       <ViewRequestModal
         request={viewingRequest}
