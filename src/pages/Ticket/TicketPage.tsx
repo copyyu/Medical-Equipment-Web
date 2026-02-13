@@ -24,7 +24,7 @@ export default function TicketPage() {
   const [categories, setCategories] = useState<Array<{ id: number; name: string }>>([]);
   const [stats, setStats] = useState<TicketStats>({
     total: 0,
-    inProgress: 0,
+    in_process: 0,
     completed: 0,
     sendToOutsource: 0,
   });
