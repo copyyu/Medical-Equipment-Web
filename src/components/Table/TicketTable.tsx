@@ -1,5 +1,6 @@
 import { Search, Edit, Trash2, FileText, Calendar, Clock, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
-import { requestTypeConfig, statusConfig, type RequestItem } from '../../types/status';
+import type { RequestItem } from '../../types/status';
+import { ticketStatusConfig, ticketTypeConfig, ticketPriorityConfig } from '../../types/ticket';
 
 interface RequestTableProps {
   data: RequestItem[];
@@ -11,10 +12,10 @@ interface RequestTableProps {
 export default function TicketTable({ data, onView, onEdit, onDelete }: RequestTableProps) {
   const getStatusIcon = (status: RequestItem['status']) => {
     switch (status) {
-      case 'pending': return Clock;
-      case 'in-progress': return AlertCircle;
-      case 'completed': return CheckCircle;
-      case 'rejected': return XCircle;
+      case 'in_progress': return AlertCircle;
+      case 'return_equipment_back': return CheckCircle;
+      case 'send_to_outsource': return Clock;
+      default: return AlertCircle;
     }
   };
 
@@ -49,7 +50,7 @@ export default function TicketTable({ data, onView, onEdit, onDelete }: RequestT
                 สถานะ
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                ผู้รับผิดชอบ
+                ความสำคัญ
               </th>
               <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 การดำเนินการ
@@ -59,7 +60,9 @@ export default function TicketTable({ data, onView, onEdit, onDelete }: RequestT
           <tbody className="divide-y divide-gray-200">
             {data.map((item) => {
               const StatusIcon = getStatusIcon(item.status);
-              
+              const statusConfig = ticketStatusConfig[item.status];
+              const priorityConfig = ticketPriorityConfig[item.priority];
+
               return (
                 <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -68,8 +71,8 @@ export default function TicketTable({ data, onView, onEdit, onDelete }: RequestT
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 rounded-md text-xs font-medium ${requestTypeConfig[item.requestType].color} flex items-center gap-1 w-fit`}>
-                      <span>{requestTypeConfig[item.requestType].label}</span>
+                    <span className={`px-3 py-1 rounded-md text-xs font-medium ${ticketTypeConfig[item.requestType]?.color || 'bg-gray-100 text-gray-700'}`}>
+                      {ticketTypeConfig[item.requestType]?.label || item.requestType}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -91,36 +94,36 @@ export default function TicketTable({ data, onView, onEdit, onDelete }: RequestT
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 rounded-md text-xs font-medium ${statusConfig[item.status].color} flex items-center gap-1 w-fit`}>
+                    <span className={`px-3 py-1 rounded-md text-xs font-medium border flex items-center gap-1 w-fit ${statusConfig.color}`}>
                       <StatusIcon className="w-3.5 h-3.5" />
-                      <span>{statusConfig[item.status].label}</span>
+                      <span>{statusConfig.label}</span>
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">
-                      {item.assignedTo || '-'}
+                    <span className={`px-3 py-1 rounded-md text-xs font-medium border ${priorityConfig.color}`}>
+                      {priorityConfig.label}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button 
+                      <button
                         onClick={() => onView(item)}
-                        className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" 
+                        className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                         title="ดูรายละเอียด"
                       >
                         <FileText className="w-4 h-4" />
                       </button>
-                      <button 
+                      <button
                         onClick={() => onEdit(item)}
-                        className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" 
+                        className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
                         title="แก้ไข"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       {onDelete && (
-                        <button 
+                        <button
                           onClick={() => onDelete(item)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" 
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="ลบ"
                         >
                           <Trash2 className="w-4 h-4" />
