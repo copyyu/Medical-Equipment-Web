@@ -283,7 +283,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Model */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            รุ่น <span className="text-red-500">*</span>
+            ชื่อรุ่น <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
