@@ -61,9 +61,8 @@ export default function FilterBar({
                 >
                   <option value="all">ทั้งหมด</option>
                   <option value="repair">แจ้งซ่อม</option>
-                  <option value="replace">แจ้งเปลี่ยน</option>
                   <option value="maintenance">บำรุงรักษา</option>
-                  <option value="inspection">ตรวจสอบ</option>
+                  <option value="inspection">สอบถามการใช้งาน</option>
                   <option value="other">อื่นๆ</option>
                 </select>
               </div>
