@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import * as XLSX from 'xlsx';
-import type { ExcelData, ExcelUploadProps } from '../../types/equipment';
+import type { ExcelData, ExcelUploadProps, ImportResultData } from '../../types/equipment';
 import { importExcelFile } from '../../service/equipmentService';
 
 const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
@@ -10,10 +10,15 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isImporting, setIsImporting] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  
+  // Modal states
+  const [showResultModal, setShowResultModal] = useState<boolean>(false);
+  const [importResult, setImportResult] = useState<ImportResultData | null>(null);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const downloadTemplate = () => {
-    // Template ตามโครงสร้างที่ Backend ต้องการ
     const template = [
       {
         'รหัสอุปกรณ์': 'EQ-2024-001',
@@ -44,7 +49,6 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Template');
 
-    // ปรับความกว้างคอลัมน์
     const wscols = [
       { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 20 },
       { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 },
@@ -62,11 +66,31 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
     return row[thaiName] || row[englishName] || '';
   };
 
+  const parseExcelDate = (dateValue: any): string => {
+    if (!dateValue) return '';
+    if (dateValue === '-') return '';
+    if (typeof dateValue === 'string' && dateValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return dateValue;
+    }
+    if (typeof dateValue === 'number') {
+      const date = new Date((dateValue - 25569) * 86400 * 1000);
+      return date.toISOString().split('T')[0];
+    }
+    try {
+      const date = new Date(dateValue);
+      if (!isNaN(date.getTime())) {
+        return date.toISOString().split('T')[0];
+      }
+    } catch (err) {
+      console.log('Date parse error:', err);
+    }
+    return '';
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.name.match(/\.(xlsx|xls)$/)) {
       setError('กรุณาเลือกไฟล์ Excel (.xlsx หรือ .xls)');
       return;
@@ -83,48 +107,36 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-      // แปลงข้อมูลให้ตรงกับ ExcelData type
       const mappedData: ExcelData[] = jsonData.map((row: any) => {
         const mapped: ExcelData = {
-          // Basic Info - รองรับทั้งภาษาไทยและอังกฤษ
           idCode: getColumnValue(row, 'รหัสอุปกรณ์', 'ID CODE'),
           serialNo: getColumnValue(row, 'หมายเลขเครื่อง', 'Serial No'),
           assessmentId: getColumnValue(row, 'รหัสการประเมิน', 'Assessment ID'),
-
-          // Relations
           department: getColumnValue(row, 'แผนก', 'Department'),
           category: getColumnValue(row, 'หมวดหมู่', 'Equipment Category'),
           brand: getColumnValue(row, 'ยี่ห้อ', 'Brand'),
           model: getColumnValue(row, 'รุ่น', 'Model'),
-
-          // Date & Price
           receiveDate: parseExcelDate(getColumnValue(row, 'วันที่รับอุปกรณ์', 'Receive Date')),
           purchasePrice: parseFloat(getColumnValue(row, 'ราคาซื้อ', 'Purchase price')) || 0,
-
-          // Life Cycle
           lifeExpectancy: parseFloat(getColumnValue(row, 'อายุการใช้งาน', 'Life Expect')) || 10,
           equipmentAge: parseFloat(getColumnValue(row, 'อายุเครื่อง', 'Equipment Age')) || 0,
           computeDate: parseExcelDate(getColumnValue(row, 'วันที่คำนวณ', 'Compute Date')),
           remainLife: parseFloat(getColumnValue(row, 'อายุคงเหลือ', 'Remain Life')) || 0,
           usefulLifetimePercent: parseFloat(getColumnValue(row, '%การใช้งาน', '% of useful lifetime')) || 0,
           replacementYear: parseInt(getColumnValue(row, 'ปีที่ต้องเปลี่ยน', 'Replacement Year')) || 0,
-
-          // Assessment Scores (0-5)
           technology: row['คะแนนเทคโนโลยี'] ? parseFloat(row['คะแนนเทคโนโลยี']) : null,
           usageStatistics: row['คะแนนสถิติการใช้งาน'] ? parseFloat(row['คะแนนสถิติการใช้งาน']) : null,
           efficiency: row['คะแนนประสิทธิภาพ'] ? parseFloat(row['คะแนนประสิทธิภาพ']) : null,
           others: getColumnValue(row, 'หมายเหตุ', 'Note'),
-
-          // Excel-specific fields (optional)
           ecriRisk: row['ECRI Risk'] || '',
           classification: row['Classification'] || '',
           totalCM: row['Total of CM'] ? parseInt(row['Total of CM']) : undefined,
           totalCost: row['Total Cost'] ? parseFloat(row['Total Cost']) : undefined,
           perCostPrice: row['Per Cost Price'] ? parseFloat(row['Per Cost Price']) : undefined
         };
-
         return mapped;
       });
+      
       setPreviewData(mappedData);
     } catch (err) {
       setError('เกิดข้อผิดพลาดในการอ่านไฟล์ กรุณาตรวจสอบไฟล์และลองใหม่อีกครั้ง');
@@ -132,37 +144,6 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Parse Excel date to YYYY-MM-DD
-  const parseExcelDate = (dateValue: any): string => {
-    if (!dateValue) return '';
-
-    // ถ้าเป็น "-" ให้คืนค่าว่าง
-    if (dateValue === '-') return '';
-
-    // If already in YYYY-MM-DD format
-    if (typeof dateValue === 'string' && dateValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      return dateValue;
-    }
-
-    // If Excel serial date (number)
-    if (typeof dateValue === 'number') {
-      const date = new Date((dateValue - 25569) * 86400 * 1000);
-      return date.toISOString().split('T')[0];
-    }
-
-    // Try parsing as date string
-    try {
-      const date = new Date(dateValue);
-      if (!isNaN(date.getTime())) {
-        return date.toISOString().split('T')[0];
-      }
-    } catch (err) {
-      console.log('Date parse error:', err);
-    }
-
-    return '';
   };
 
   const handleImport = async () => {
@@ -180,62 +161,35 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
     setError('');
 
     try {
-      // เรียก API ด้วย FormData
       const result = await importExcelFile(selectedFile);
+      
+      setImportResult(result.data);
+      setIsSuccess(true);
+      setShowResultModal(true);
 
-      // แสดงผลลัพธ์
-      const successMsg = buildSuccessMessage(result.data);
-      alert(successMsg);
-
-      // Clear form
       handleClear();
 
-      // Callback
       if (onImportComplete) {
         onImportComplete();
       }
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการนำเข้าข้อมูล';
-      setError(errorMessage);
+      
+      setImportResult({
+        total_rows: 0,
+        success_count: 0,
+        failed_count: 0,
+        skipped_count: 0,
+        error_messages: [errorMessage]
+      });
+      setIsSuccess(false);
+      setShowResultModal(true);
+      
       console.error('Error importing file:', err);
     } finally {
       setIsImporting(false);
     }
-  };
-
-  const buildSuccessMessage = (result: any): string => {
-    const lines = [
-      `นำเข้าข้อมูลสำเร็จ!`,
-      ``,
-      `สรุปผลการนำเข้า:`,
-      `- ทั้งหมด: ${result.total_rows} รายการ`,
-      `- สำเร็จ: ${result.success_count} รายการ`,
-      `- ล้มเหลว: ${result.failed_count} รายการ`,
-      `- ข้าม: ${result.skipped_count} รายการ`,
-    ];
-
-    if (result.new_brands > 0 || result.new_categories > 0 || result.new_departments > 0 || result.new_models > 0) {
-      lines.push(``);
-      lines.push(`ข้อมูลหลักที่สร้างใหม่:`);
-      if (result.new_brands > 0) lines.push(`- ยี่ห้อ: ${result.new_brands}`);
-      if (result.new_categories > 0) lines.push(`- หมวดหมู่: ${result.new_categories}`);
-      if (result.new_departments > 0) lines.push(`- แผนก: ${result.new_departments}`);
-      if (result.new_models > 0) lines.push(`- รุ่น: ${result.new_models}`);
-    }
-
-    if (result.failed_count > 0 && result.error_messages?.length > 0) {
-      lines.push(``);
-      lines.push(`ข้อผิดพลาด:`);
-      result.error_messages.slice(0, 5).forEach((msg: string) => {
-        lines.push(`- ${msg}`);
-      });
-      if (result.error_messages.length > 5) {
-        lines.push(`... และอีก ${result.error_messages.length - 5} ข้อผิดพลาด`);
-      }
-    }
-
-    return lines.join('\n');
   };
 
   const handleClear = () => {
@@ -246,6 +200,11 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+  };
+
+  const closeModal = () => {
+    setShowResultModal(false);
+    setImportResult(null);
   };
 
   return (
@@ -387,6 +346,56 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
                 <>นำเข้าข้อมูล</>
               )}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Beautiful Result Modal - Matching the design in the image */}
+      {showResultModal && importResult && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={closeModal}>
+          <div className="bg-gradient-to-b from-gray-800 to-gray-900 rounded-2xl shadow-2xl max-w-md w-full p-8 text-white" onClick={(e) => e.stopPropagation()}>
+            
+            {/* Title */}
+            <h2 className="text-xl font-bold text-center mb-6">
+              นำเข้าข้อมูลสำเร็จ!
+            </h2>
+
+            {/* Summary Section */}
+            <div className="space-y-3 mb-8">
+              <p className="text-gray-300 font-medium">สรุปผลการนำเข้า:</p>
+              
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">- ทั้งหมด:</span>
+                  <span className="font-semibold">{importResult.total_rows} รายการ</span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">- สำเร็จ:</span>
+                  <span className="font-semibold text-green-400">{importResult.success_count} รายการ</span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">- ซ้ำเหลือ:</span>
+                  <span className="font-semibold text-amber-400">{importResult.skipped_count} รายการ</span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400">- ข้าม:</span>
+                  <span className="font-semibold text-yellow-400">{importResult.failed_count} รายการ</span>
+                </div>
+              </div>
+            </div>
+
+            {/* OK Button */}
+            <div className="flex justify-center">
+              <button
+                onClick={closeModal}
+                className="px-16 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-full font-medium transition-colors shadow-lg hover:shadow-xl"
+              >
+                OK
+              </button>
+            </div>
           </div>
         </div>
       )}

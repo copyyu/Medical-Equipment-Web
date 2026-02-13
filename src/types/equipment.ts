@@ -292,3 +292,84 @@ export interface EquipmentStats {
   };
   upcomingReplacements: Equipment[];
 }
+// types/equipment.ts
+
+export interface ExcelData {
+  // Basic Info
+  idCode: string;
+  serialNo: string;
+  assessmentId: string;
+
+  // Relations
+  department: string;
+  category: string;
+  brand: string;
+  model: string;
+
+  // Date & Price
+  receiveDate: string;
+  purchasePrice: number;
+
+  // Life Cycle
+  lifeExpectancy: number;
+  equipmentAge: number;
+  computeDate: string;
+  remainLife: number;
+  usefulLifetimePercent: number;
+  replacementYear: number;
+
+  // Assessment Scores (0-5)
+  technology: number | null;
+  usageStatistics: number | null;
+  efficiency: number | null;
+  others: string;
+
+  // Excel-specific fields (optional)
+  ecriRisk?: string;
+  classification?: string;
+  totalCM?: number;
+  totalCost?: number;
+  perCostPrice?: number;
+}
+
+export interface ExcelUploadProps {
+  onImportComplete?: () => void;
+  onSubmit?: (data: EquipmentFormData) => void;
+  onCancel?: () => void;
+}
+
+export interface EquipmentFormData {
+  idCode: string;
+  serialNo: string;
+  assessmentId: string;
+  department: string;
+  category: string;
+  brand: string;
+  model: string;
+  receiveDate: string;
+  purchasePrice: number;
+  lifeExpectancy: number;
+  equipmentAge: number;
+  computeDate: string;
+  remainLife: number;
+  usefulLifetimePercent: number;
+  replacementYear: number;
+}
+
+export interface ImportResultData {
+  total_rows: number;
+  success_count: number;
+  failed_count: number;
+  skipped_count: number;
+  new_brands?: number;
+  new_categories?: number;
+  new_departments?: number;
+  new_models?: number;
+  error_messages?: string[];
+}
+
+export interface ImportResponse {
+  success: boolean;
+  data?: ImportResultData;
+  message?: string;
+}
