@@ -6,19 +6,37 @@ export type TicketType = 'repair' | 'maintenance' | 'inspection' | 'other';
 
 export const ticketStatusConfig: Record<TicketStatus, {
     label: string;
+    labelThai: string;
     color: string;
+    bgColor: string;
+    borderColor: string;
+    icon: string;
+    note?: string;
 }> = {
     in_process: {
-        label: 'in Process',
-        color: 'bg-blue-100 text-blue-700 border-blue-300'
+        label: 'In Process',
+        labelThai: 'กำลังดำเนินการ',
+        color: 'text-blue-600',
+        bgColor: 'bg-blue-50',
+        borderColor: 'border-blue-200',
+        icon: 'HiOutlineCog6Tooth'
     },
     return_equipment_back: {
         label: 'Return Equipment Back',
-        color: 'bg-green-100 text-green-700 border-green-300'
+        labelThai: 'ส่งคืนอุปกรณ์แล้ว',
+        color: 'text-emerald-600',
+        bgColor: 'bg-emerald-50',
+        borderColor: 'border-emerald-200',
+        icon: 'HiOutlineCheckBadge',
+        note: 'Job Closed'
     },
     send_to_outsource: {
         label: 'Send to Outsource',
-        color: 'bg-orange-100 text-orange-700 border-orange-300'
+        labelThai: 'ส่งซ่อมภายนอก',
+        color: 'text-orange-600',
+        bgColor: 'bg-orange-50',
+        borderColor: 'border-orange-200',
+        icon: 'HiOutlineArrowUpTray'
     }
 };
 
@@ -164,16 +182,18 @@ export interface TicketCategories {
 export interface RequestItem {
     id: string;
     requestNumber: string;
+    requestType: TicketType;
     equipmentName: string;
     equipmentSerial: string;
     requesterName: string;
     department: string;
     description: string;
-    requestType: string;
     requestDate: string;
-    status: TicketStatus;
     priority: TicketPriority;
+    status: TicketStatus;
     assignedTo?: string;
-    createdAt: string;
-    updatedAt: string;
+    categoryId?: number;
+    completedDate?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }

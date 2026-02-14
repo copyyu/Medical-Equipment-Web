@@ -52,26 +52,7 @@ export interface RecentJob {
   updatedAt: string
 }
 
-import type { TicketStatus, TicketType, TicketPriority } from './ticket';
-
-export interface RequestItem {
-  id: string;
-  requestNumber: string;
-  requestType: TicketType;
-  equipmentName: string;
-  equipmentSerial: string;
-  requesterName: string;
-  department: string;
-  requestDate: string;
-  description: string;
-  priority: TicketPriority;
-  status: TicketStatus;
-  assignedTo?: string;
-  categoryId?: number;
-  completedDate?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+export type { RequestItem } from './ticket';
 
 export const requestTypeConfig = {
   repair: { label: 'แจ้งซ่อม', color: 'bg-orange-100 text-orange-700' },
