@@ -1,3 +1,4 @@
+import { api, type ApiResponse } from './api'
 import type {
     TicketListItem,
     TicketDetail,
@@ -5,14 +6,6 @@ import type {
     TicketStatus,
     TicketPriority
 } from '../types/ticket';
-
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081';
-
-export interface ApiResponse<T> {
-    success: boolean;
-    message: string;
-    data: T;
-}
 
 export interface TicketListResponse {
     data: TicketItemApiResponse[];
@@ -53,10 +46,10 @@ function mapApiItemToFrontend(item: TicketItemApiResponse): TicketListItem {
         description: item.description,
         categoryId: item.category_id,
         categoryName: item.category_name,
-        priority: mapApiPriorityToFrontend(item.priority),
+        priority: item.priority as TicketPriority,
         priorityText: item.priority_text,
 
-        status: mapApiStatusToFrontend(item.status),
+        status: item.status as TicketStatus,
         statusText: item.status_text,
 
         equipmentName: item.equipment_name,
@@ -135,25 +128,6 @@ export interface TicketListParams {
     sort_dir?: string;
 }
 
-function mapApiStatusToFrontend(status: string): TicketStatus {
-    const statusMap: Record<string, TicketStatus> = {
-        'in_process': 'in_process',
-        'return_equipment_back': 'return_equipment_back',
-        'send_to_outsource': 'send_to_outsource'
-    };
-    return statusMap[status] || 'in_process';
-}
-
-function mapApiPriorityToFrontend(priority: string): TicketPriority {
-    const priorityMap: Record<string, TicketPriority> = {
-        'low': 'low',
-        'medium': 'medium',
-        'high': 'high',
-        'urgent': 'urgent'
-    };
-    return priorityMap[priority] || 'medium';
-}
-
 function mapApiDetailToFrontend(item: TicketDetailApiResponse): TicketDetail {
     return {
         id: item.id,
@@ -161,10 +135,10 @@ function mapApiDetailToFrontend(item: TicketDetailApiResponse): TicketDetail {
         description: item.description,
         categoryId: item.category_id,
         categoryName: item.category_name,
-        priority: mapApiPriorityToFrontend(item.priority),
+        priority: item.priority as TicketPriority,
         priorityText: item.priority_text,
 
-        status: mapApiStatusToFrontend(item.status),
+        status: item.status as TicketStatus,
         statusText: item.status_text,
 
         equipmentId: item.equipment_id,
@@ -226,18 +200,7 @@ export async function fetchTicketList(params: TicketListParams = {}): Promise<{
     if (params.sort_by) queryParams.append('sort_by', params.sort_by);
     if (params.sort_dir) queryParams.append('sort_dir', params.sort_dir);
 
-    const url = `${BASE_URL}/api/tickets?${queryParams.toString()}`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result: ApiResponse<TicketListResponse> = await response.json();
-
-    if (!result.success) {
-        throw new Error(result.message || 'Failed to fetch ticket list');
-    }
+    const result = await api.get<ApiResponse<TicketListResponse>>(`/api/tickets?${queryParams.toString()}`);
 
     return {
         data: result.data.data.map(mapApiItemToFrontend),
@@ -253,19 +216,7 @@ export async function fetchTicketList(params: TicketListParams = {}): Promise<{
  * GET /api/tickets/:id
  */
 export async function getTicketById(id: string | number): Promise<TicketDetail> {
-    const url = `${BASE_URL}/api/tickets/${id}`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result: ApiResponse<TicketDetailApiResponse> = await response.json();
-
-    if (!result.success) {
-        throw new Error(result.message || 'Failed to get ticket');
-    }
-
+    const result = await api.get<ApiResponse<TicketDetailApiResponse>>(`/api/tickets/${id}`);
     return mapApiDetailToFrontend(result.data);
 }
 
@@ -274,18 +225,7 @@ export async function getTicketById(id: string | number): Promise<TicketDetail> 
  * GET /api/tickets/stats
  */
 export async function fetchTicketStats(): Promise<TicketStats> {
-    const url = `${BASE_URL}/api/tickets/stats`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result: ApiResponse<TicketStatsApiResponse> = await response.json();
-
-    if (!result.success) {
-        throw new Error(result.message || 'Failed to fetch ticket stats');
-    }
+    const result = await api.get<ApiResponse<TicketStatsApiResponse>>(`/api/tickets/stats`);
 
     return {
         total: result.data.total,
@@ -309,23 +249,5 @@ export async function updateTicket(
         note?: string;
     }
 ): Promise<void> {
-    const url = `${BASE_URL}/api/tickets/${id}`;
-    const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result: ApiResponse<null> = await response.json();
-
-    if (!result.success) {
-        throw new Error(result.message || 'Failed to update ticket');
-    }
+    await api.put(`/api/tickets/${id}`, data);
 }
-
