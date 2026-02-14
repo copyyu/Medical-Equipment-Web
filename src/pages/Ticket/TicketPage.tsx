@@ -21,7 +21,7 @@ export default function TicketPage() {
 
   // API State
   const [tickets, setTickets] = useState<TicketListItem[]>([]);
-  const [categories, setCategories] = useState<Array<{ id: number; name: string }>>([]);
+
   const [stats, setStats] = useState<TicketStats>({
     total: 0,
     in_process: 0,
@@ -91,12 +91,7 @@ export default function TicketPage() {
       });
     };
 
-    // Try to find category ID from name if missing
-    let catId = ticket.categoryId;
-    if (!catId && ticket.categoryName && categories.length > 0) {
-      const found = categories.find(c => c.name === ticket.categoryName);
-      if (found) catId = found.id;
-    }
+    const catId = ticket.categoryId;
 
     return {
       id: ticket.id.toString(),

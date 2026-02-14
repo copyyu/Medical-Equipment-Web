@@ -1,4 +1,4 @@
-import { Search, Edit, Trash2, FileText, Calendar, Clock, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { Search, Edit, Trash2, FileText, Calendar, Clock, AlertCircle, CheckCircle } from 'lucide-react';
 import type { RequestItem } from '../../types/status';
 import { ticketStatusConfig, ticketTypeConfig, ticketPriorityConfig } from '../../types/ticket';
 

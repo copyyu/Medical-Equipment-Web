@@ -15,28 +15,23 @@ export interface EquipmentListItem {
     location: string
     lastCheck: string
     expiry: string
-    isExpiring?: boolean 
-    remain_life?: number 
+    isExpiring?: boolean
+    remain_life?: number
 }
 
 interface EquipmentTableProps {
     data: EquipmentListItem[]
-    total?: number 
+    total?: number
     onView: (item: EquipmentListItem) => void
     onEdit: (item: EquipmentListItem) => void
     onDelete?: (item: EquipmentListItem) => void
 }
 
-const getExpiryStatus = (expiryDate: string) => {
-    if (!expiryDate || expiryDate === '-') return 'ok'
-    const today = new Date()
-    const expiry = new Date(expiryDate)
-    const diffTime = expiry.getTime() - today.getTime()
-    const daysUntilExpiry = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-    if (daysUntilExpiry < 0) return 'expired'
-    if (daysUntilExpiry <= 30) return 'expiring'
-    return 'ok'
+const getExpiryStatus = (remainLife?: number) => {
+    if (remainLife === undefined || remainLife === null) return 'ok'
+    if (remainLife <= 0) return 'expired'       // หมดอายุแล้ว (remain_life <= 0)
+    if (remainLife <= 1) return 'expiring'       // ใกล้หมดอายุ (0 < remain_life <= 1)
+    return 'ok'                                  // ปกติ
 }
 
 export default function EquipmentTable({ data, total, onView, onEdit, onDelete }: EquipmentTableProps) {
@@ -75,8 +70,8 @@ export default function EquipmentTable({ data, total, onView, onEdit, onDelete }
                                 bgColor: 'bg-gray-100',
                                 textColor: 'text-gray-800'
                             }
-                            
-                            const expiryStatus = getExpiryStatus(item.expiry)
+
+                            const expiryStatus = getExpiryStatus(item.remain_life)
 
                             return (
                                 <tr key={item.id} className="hover:bg-gray-50 transition-colors group">
@@ -102,14 +97,13 @@ export default function EquipmentTable({ data, total, onView, onEdit, onDelete }
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center gap-2">
-                                            <span className={`text-sm ${
-                                                expiryStatus === 'expired' ? 'text-red-600 font-medium' :
+                                            <span className={`text-sm ${expiryStatus === 'expired' ? 'text-red-600 font-medium' :
                                                 expiryStatus === 'expiring' ? 'text-orange-600 font-medium' :
-                                                'text-gray-500'
-                                            }`}>
+                                                    'text-gray-500'
+                                                }`}>
                                                 {item.expiry}
                                             </span>
-                                            
+
                                             {/* ✅✅ แก้กลับเป็นแบบเดิม (ป้ายข้อความ) ✅✅ */}
                                             {expiryStatus === 'expired' && (
                                                 <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded">หมดอายุ</span>
