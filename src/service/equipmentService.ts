@@ -1,69 +1,56 @@
-import type { CreateEquipmentRequest, EquipmentFormData, EquipmentImportResult, EquipmentListItem, EquipmentResponse } from '../types/equipment'
-
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081'
+import { api, type ApiResponse } from './api'
+import type {
+  CreateEquipmentRequest,
+  EquipmentFormData,
+  EquipmentImportResult,
+  EquipmentListItem,
+  EquipmentResponse,
+  EquipmentUpdateRequest
+} from '../types/equipment'
 
 // API Response Types
 export interface EquipmentListResponse {
-    data: EquipmentApiItem[]
-    total: number
-    page: number
-    limit: number
-    total_pages: number
+  data: EquipmentApiItem[]
+  total: number
+  page: number
+  limit: number
+  total_pages: number
 }
 
 export interface EquipmentApiItem {
-    id: string
-    name: string
-    category: string
-    status: string
-    location: string
-    last_check: string
-    expiry: string
-    is_expiring: boolean
-}
-
-export interface ApiResponse<T> {
-    success: boolean
-    message: string
-    data: T
+  id: string
+  name: string
+  category: string
+  status: string
+  location: string
+  last_check: string
+  expiry: string
+  is_expiring: boolean
+  remain_life: number
 }
 
 export interface EquipmentListParams {
-    page?: number
-    limit?: number
-    status?: string
-    search?: string
-    sort_by?: string
-    sort_dir?: string
-}
-
-// Map API status to frontend EquipmentStatus
-// Backend ส่ง Asset Status: active, defective, wait_decom, decommission, active_ready_to_sell, missing, plan_to_replace
-function mapApiStatusToFrontend(status: string): EquipmentListItem['status'] {
-    const statusMap: Record<string, EquipmentListItem['status']> = {
-        'active': 'active',
-        'defective': 'defective',
-        'wait_decom': 'wait_decom',
-        'decommission': 'decommission',
-        'active_ready_to_sell': 'active_ready_to_sell',
-        'missing': 'missing',
-        'plan_to_replace': 'plan_to_replace'
-    }
-    return statusMap[status] || 'active'
+  page?: number
+  limit?: number
+  status?: string
+  search?: string
+  sort_by?: string
+  sort_dir?: string
 }
 
 // Map API item to frontend EquipmentListItem
 function mapApiItemToFrontend(item: EquipmentApiItem): EquipmentListItem {
-    return {
-        id: item.id,
-        name: item.name,
-        category: item.category,
-        status: mapApiStatusToFrontend(item.status),
-        location: item.location,
-        lastCheck: item.last_check,
-        expiry: item.expiry,
-        isExpiring: item.is_expiring
-    }
+  return {
+    id: item.id,
+    name: item.name,
+    category: item.category,
+    status: item.status,
+    location: item.location,
+    lastCheck: item.last_check,
+    expiry: item.expiry,
+    isExpiring: item.is_expiring,
+    remain_life: item.remain_life
+  }
 }
 
 export function mapFormDataToRequest(formData: EquipmentFormData): CreateEquipmentRequest {
@@ -84,27 +71,13 @@ export function mapFormDataToRequest(formData: EquipmentFormData): CreateEquipme
   };
 
   // Optional fields
-  if (formData.assessmentId) {
-    request.assessment_id = formData.assessmentId;
-  }
-  if (formData.computeDate) {
-    request.compute_date = formData.computeDate;
-  }
-  if (formData.replacementYear && formData.replacementYear > 0) {
-    request.replacement_year = formData.replacementYear;
-  }
-  if (formData.technology !== null && formData.technology !== undefined) {
-    request.technology = formData.technology;
-  }
-  if (formData.usageStatistics !== null && formData.usageStatistics !== undefined) {
-    request.usage_statistics = formData.usageStatistics;
-  }
-  if (formData.efficiency !== null && formData.efficiency !== undefined) {
-    request.efficiency = formData.efficiency;
-  }
-  if (formData.others) {
-    request.others = formData.others;
-  }
+  if (formData.assessmentId) request.assessment_id = formData.assessmentId;
+  if (formData.computeDate) request.compute_date = formData.computeDate;
+  if (formData.replacementYear && formData.replacementYear > 0) request.replacement_year = formData.replacementYear;
+  if (formData.technology !== null && formData.technology !== undefined) request.technology = formData.technology;
+  if (formData.usageStatistics !== null && formData.usageStatistics !== undefined) request.usage_statistics = formData.usageStatistics;
+  if (formData.efficiency !== null && formData.efficiency !== undefined) request.efficiency = formData.efficiency;
+  if (formData.others) request.others = formData.others;
 
   return request;
 }
@@ -136,137 +109,53 @@ export function mapResponseToFormData(
 }
 
 export async function fetchEquipmentList(params: EquipmentListParams = {}): Promise<{
-    data: EquipmentListItem[]
-    total: number
-    page: number
-    limit: number
-    totalPages: number
+  data: EquipmentListItem[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
 }> {
-    const queryParams = new URLSearchParams()
+  const queryParams = new URLSearchParams()
 
-    if (params.page) queryParams.append('page', params.page.toString())
-    if (params.limit) queryParams.append('limit', params.limit.toString())
-    if (params.status) queryParams.append('status', params.status)
-    if (params.search) queryParams.append('search', params.search)
-    if (params.sort_by) queryParams.append('sort_by', params.sort_by)
-    if (params.sort_dir) queryParams.append('sort_dir', params.sort_dir)
+  if (params.page) queryParams.append('page', params.page.toString())
+  if (params.limit) queryParams.append('limit', params.limit.toString())
+  if (params.status) queryParams.append('status', params.status)
+  if (params.search) queryParams.append('search', params.search)
+  if (params.sort_by) queryParams.append('sort_by', params.sort_by)
+  if (params.sort_dir) queryParams.append('sort_dir', params.sort_dir)
 
-    const url = `${BASE_URL}/api/equipment?${queryParams.toString()}`
-    const response = await fetch(url)
+  const response = await api.get<ApiResponse<EquipmentListResponse>>(`/api/equipment?${queryParams.toString()}`)
 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const result: ApiResponse<EquipmentListResponse> = await response.json()
-
-    if (!result.success) {
-        throw new Error(result.message || 'Failed to fetch equipment list')
-    }
-
-    return {
-        data: result.data.data.map(mapApiItemToFrontend),
-        total: result.data.total,
-        page: result.data.page,
-        limit: result.data.limit,
-        totalPages: result.data.total_pages
-    }
-}
-
-// Equipment Update Request
-export interface EquipmentUpdateRequest {
-    status?: string
-    location?: string
-    compute_date?: string
-    expiry_date?: string  // วันหมดอายุ - Backend จะคำนวณ remain_life ใหม่
+  return {
+    data: response.data.data.map(mapApiItemToFrontend),
+    total: response.data.total,
+    page: response.data.page,
+    limit: response.data.limit,
+    totalPages: response.data.total_pages
+  }
 }
 
 // Update equipment by ID
 export async function updateEquipment(id: string, data: EquipmentUpdateRequest): Promise<void> {
-    const url = `${BASE_URL}/api/equipment/${id}`
-    const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const result: ApiResponse<null> = await response.json()
-
-    if (!result.success) {
-        throw new Error(result.message || 'Failed to update equipment')
-    }
+  await api.put(`/api/equipment/${id}`, data)
 }
 
 // Delete equipment by ID
 export async function deleteEquipment(id: string): Promise<void> {
-    const url = `${BASE_URL}/api/equipment/${id}`
-    const response = await fetch(url, {
-        method: 'DELETE'
-    })
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const result: ApiResponse<null> = await response.json()
-
-    if (!result.success) {
-        throw new Error(result.message || 'Failed to delete equipment')
-    }
+  await api.delete(`/api/equipment/${id}`)
 }
 
 // Get equipment detail by ID
 export async function getEquipmentById(id: string): Promise<EquipmentListItem> {
-    const url = `${BASE_URL}/api/equipment/${id}`
-    const response = await fetch(url)
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const result: ApiResponse<EquipmentApiItem> = await response.json()
-
-    if (!result.success) {
-        throw new Error(result.message || 'Failed to get equipment')
-    }
-
-    return mapApiItemToFrontend(result.data)
+  const response = await api.get<ApiResponse<EquipmentApiItem>>(`/api/equipment/${id}`)
+  return mapApiItemToFrontend(response.data)
 }
 
 export async function createEquipment(
   formData: EquipmentFormData
 ): Promise<ApiResponse<EquipmentResponse>> {
   const requestData = mapFormDataToRequest(formData);
-
-  const url = `${BASE_URL}/api/equipment`;
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(requestData),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ 
-      message: `HTTP error! status: ${response.status}` 
-    }));
-    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-  }
-
-  const result: ApiResponse<EquipmentResponse> = await response.json();
-
-  if (!result.success) {
-    throw new Error(result.message || 'Failed to create equipment');
-  }
-
-  return result;
+  return api.post<ApiResponse<EquipmentResponse>>('/api/equipment', requestData);
 }
 
 export async function importExcelFile(
@@ -274,67 +163,5 @@ export async function importExcelFile(
 ): Promise<ApiResponse<EquipmentImportResult>> {
   const formData = new FormData();
   formData.append('file', file);
-
-  const url = `${BASE_URL}/import`;
-  const response = await fetch(url, {
-    method: 'POST',
-    body: formData, 
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ 
-      message: `HTTP error! status: ${response.status}` 
-    }));
-    throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
-  }
-
-  const result = await response.json();
-
-  if (!result.success) {
-    throw new Error(result.message || result.error || 'Failed to import Excel file');
-  }
-
-  return result;
+  return api.upload<ApiResponse<EquipmentImportResult>>('/import', formData);
 }
-
-// export async function importExcelBatch(
-//   files: File[]
-// ): Promise<ApiResponse<{
-//   files_count: number;
-//   total_success: number;
-//   total_failed: number;
-//   results: Array<{
-//     filename: string;
-//     success: boolean;
-//     data?: EquipmentImportResult;
-//     error?: string;
-//   }>;
-// }>> {
-//   const formData = new FormData();
-  
-//   // เพิ่มไฟล์ทั้งหมดด้วย key "files"
-//   files.forEach(file => {
-//     formData.append('files', file);
-//   });
-
-//   const url = `${BASE_URL}/api/import/batch`;
-//   const response = await fetch(url, {
-//     method: 'POST',
-//     body: formData,
-//   });
-
-//   if (!response.ok) {
-//     const errorData = await response.json().catch(() => ({ 
-//       message: `HTTP error! status: ${response.status}` 
-//     }));
-//     throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
-//   }
-
-//   const result = await response.json();
-
-//   if (!result.success) {
-//     throw new Error(result.message || result.error || 'Failed to import Excel files');
-//   }
-
-//   return result;
-// }

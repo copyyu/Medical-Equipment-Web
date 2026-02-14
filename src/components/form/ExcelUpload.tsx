@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import * as XLSX from 'xlsx';
-import type { ExcelData, ExcelUploadProps, ImportResultData } from '../../types/equipment';
+import type { ExcelData, ExcelUploadProps, EquipmentImportResult } from '../../types/equipment';
 import { importExcelFile } from '../../service/equipmentService';
 
 const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
@@ -10,12 +10,12 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isImporting, setIsImporting] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  
+
   // Modal states
   const [showResultModal, setShowResultModal] = useState<boolean>(false);
-  const [importResult, setImportResult] = useState<ImportResultData | null>(null);
-  const [isSuccess, setIsSuccess] = useState<boolean>(false);
-  
+  const [importResult, setImportResult] = useState<EquipmentImportResult | null>(null);
+
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const downloadTemplate = () => {
@@ -136,7 +136,7 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
         };
         return mapped;
       });
-      
+
       setPreviewData(mappedData);
     } catch (err) {
       setError('เกิดข้อผิดพลาดในการอ่านไฟล์ กรุณาตรวจสอบไฟล์และลองใหม่อีกครั้ง');
@@ -162,9 +162,9 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
 
     try {
       const result = await importExcelFile(selectedFile);
-      
+
       setImportResult(result.data);
-      setIsSuccess(true);
+
       setShowResultModal(true);
 
       handleClear();
@@ -175,7 +175,7 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการนำเข้าข้อมูล';
-      
+
       setImportResult({
         total_rows: 0,
         success_count: 0,
@@ -183,9 +183,9 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
         skipped_count: 0,
         error_messages: [errorMessage]
       });
-      setIsSuccess(false);
+
       setShowResultModal(true);
-      
+
       console.error('Error importing file:', err);
     } finally {
       setIsImporting(false);
@@ -354,7 +354,7 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
       {showResultModal && importResult && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={closeModal}>
           <div className="bg-gradient-to-b from-gray-800 to-gray-900 rounded-2xl shadow-2xl max-w-md w-full p-8 text-white" onClick={(e) => e.stopPropagation()}>
-            
+
             {/* Title */}
             <h2 className="text-xl font-bold text-center mb-6">
               นำเข้าข้อมูลสำเร็จ!
@@ -363,23 +363,23 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
             {/* Summary Section */}
             <div className="space-y-3 mb-8">
               <p className="text-gray-300 font-medium">สรุปผลการนำเข้า:</p>
-              
+
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-400">- ทั้งหมด:</span>
                   <span className="font-semibold">{importResult.total_rows} รายการ</span>
                 </div>
-                
+
                 <div className="flex justify-between items-center">
                   <span className="text-gray-400">- สำเร็จ:</span>
                   <span className="font-semibold text-green-400">{importResult.success_count} รายการ</span>
                 </div>
-                
+
                 <div className="flex justify-between items-center">
                   <span className="text-gray-400">- ซ้ำเหลือ:</span>
                   <span className="font-semibold text-amber-400">{importResult.skipped_count} รายการ</span>
                 </div>
-                
+
                 <div className="flex justify-between items-center">
                   <span className="text-gray-400">- ข้าม:</span>
                   <span className="font-semibold text-yellow-400">{importResult.failed_count} รายการ</span>

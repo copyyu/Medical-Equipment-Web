@@ -10,7 +10,7 @@ import {
     HiOutlineArrowPath
 } from 'react-icons/hi2'
 
-import { ASSET_STATUS_CONFIG } from '../../constants/mockData'
+import { EQUIPMENT_STATUS_CONFIG } from '../../constants/equipmentOptions'
 import type { AssetStatus } from '../../types/status'
 import type { AssetStatusCount } from '../../types/dashboard'
 
@@ -93,7 +93,7 @@ function AssetStatusSkeleton() {
 
 // Asset Status Card Component
 function AssetStatusCard({ status, count, delay }: { status: AssetStatus, count: number, delay: number }) {
-    const config = ASSET_STATUS_CONFIG[status]
+    const config = EQUIPMENT_STATUS_CONFIG[status]
     const Icon = iconMap[config.icon]
     const animatedCount = useCounter(count, 1200 + delay * 100)
 

@@ -7,15 +7,7 @@ export type EquipmentStatus =
   | 'missing'
   | 'plan_to_replace'
 
-export const EQUIPMENT_STATUS_CONFIG: Record<EquipmentStatus, { label: string; labelThai: string; bgColor: string; textColor: string }> = {
-  active: { label: 'Active', labelThai: 'ใช้งานอยู่', bgColor: 'bg-emerald-100', textColor: 'text-emerald-700' },
-  defective: { label: 'Defective', labelThai: 'ชำรุด', bgColor: 'bg-red-100', textColor: 'text-red-700' },
-  wait_decom: { label: 'Wait Decom', labelThai: 'รอปลดระวาง', bgColor: 'bg-amber-100', textColor: 'text-amber-700' },
-  decommission: { label: 'Decommission', labelThai: 'ปลดระวางแล้ว', bgColor: 'bg-gray-100', textColor: 'text-gray-600' },
-  active_ready_to_sell: { label: 'Active-Ready to Sell', labelThai: 'พร้อมขาย', bgColor: 'bg-blue-100', textColor: 'text-blue-700' },
-  missing: { label: 'Missing', labelThai: 'สูญหาย', bgColor: 'bg-orange-100', textColor: 'text-orange-700' },
-  plan_to_replace: { label: 'Plan to Replace', labelThai: 'รอเปลี่ยนใหม่', bgColor: 'bg-purple-100', textColor: 'text-purple-700' }
-}
+
 
 export interface EquipmentListItem {
   id: string
@@ -26,41 +18,12 @@ export interface EquipmentListItem {
   lastCheck: string
   expiry: string
   isExpiring?: boolean
+  remain_life?: number
 }
 
-export interface EquipmentFormData {
-  // Basic Info
-  idCode: string;
-  serialNo: string;
-  assessmentId: string;
 
-  department: string;
-  brand: string;
-  model: string;
-  category: string;
 
-  // Date & Price
-  receiveDate: string;
-  purchasePrice: number;
 
-  equipmentAge: number;
-  computeDate: string;
-  lifeExpectancy: number;
-  remainLife: number;
-  usefulLifetimePercent: number;
-  replacementYear: number;
-
-  technology: number | null;
-  usageStatistics: number | null;
-  efficiency: number | null;
-  others: string;
-}
-
-export interface EquipmentFormProps {
-  onSubmit: (data: EquipmentFormData) => void;
-  onCancel: () => void;
-  initialData?: Partial<EquipmentFormData>;
-}
 
 export interface CreateEquipmentRequest {
   id_code: string;
@@ -84,11 +47,7 @@ export interface CreateEquipmentRequest {
   others?: string;
 }
 
-export interface EquipmentUpdateRequest {
-  status?: string;
-  location?: string;
-  compute_date?: string;
-}
+
 
 export interface EquipmentResponse {
   id: number;
@@ -236,49 +195,9 @@ export interface MaintenanceFormData {
   technician: string;
 }
 
-export interface ExcelData {
-  idCode: string;
-  serialNo: string;
-  assessmentId: string;
-  department: string;
-  brand: string;
-  model: string;
-  category: string;
-  receiveDate: string;
-  purchasePrice: number;
-  equipmentAge: number;
-  computeDate: string;
-  lifeExpectancy: number;
-  remainLife: number;
-  usefulLifetimePercent: number;
-  replacementYear: number;
-  technology: number | null;
-  usageStatistics: number | null;
-  efficiency: number | null;
-  others: string;
-  ecriRisk?: string;
-  classification?: string;
-  totalCM?: number;
-  totalCost?: number;
-  perCostPrice?: number;
-}
 
-export interface ExcelUploadProps {
-  onImportComplete?: () => void;
-}
 
-export interface EquipmentImportResult {
-  total_rows: number;
-  success_count: number;
-  failed_count: number;
-  skipped_count: number;
-  new_brands: number;
-  new_categories: number;
-  new_departments: number;
-  new_models: number;
-  failed_rows: number[];
-  error_messages: string[];
-}
+
 
 export interface EquipmentStats {
   totalEquipment: number;
@@ -339,24 +258,47 @@ export interface ExcelUploadProps {
 }
 
 export interface EquipmentFormData {
+  // Basic Info
   idCode: string;
   serialNo: string;
   assessmentId: string;
+
   department: string;
-  category: string;
   brand: string;
   model: string;
+  category: string;
+
+  // Date & Price
   receiveDate: string;
   purchasePrice: number;
-  lifeExpectancy: number;
+
   equipmentAge: number;
   computeDate: string;
+  lifeExpectancy: number;
   remainLife: number;
   usefulLifetimePercent: number;
   replacementYear: number;
+
+  technology: number | null;
+  usageStatistics: number | null;
+  efficiency: number | null;
+  others: string;
 }
 
-export interface ImportResultData {
+export interface EquipmentFormProps {
+  onSubmit: (data: EquipmentFormData) => void;
+  onCancel: () => void;
+  initialData?: Partial<EquipmentFormData>;
+}
+
+export interface EquipmentUpdateRequest {
+  status?: string;
+  location?: string;
+  compute_date?: string;
+  expiry_date?: string; // วันหมดอายุ - Backend จะคำนวณ remain_life ใหม่
+}
+
+export interface EquipmentImportResult {
   total_rows: number;
   success_count: number;
   failed_count: number;
@@ -370,6 +312,6 @@ export interface ImportResultData {
 
 export interface ImportResponse {
   success: boolean;
-  data?: ImportResultData;
+  data?: EquipmentImportResult;
   message?: string;
 }

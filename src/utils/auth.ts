@@ -1,4 +1,4 @@
-// Auth Utility Functions
+import type { User } from '../types/auth';
 
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'user_data';
@@ -17,11 +17,11 @@ export const removeToken = (): void => {
 };
 
 // User Data Management
-export const setUser = (user: any): void => {
+export const setUser = (user: User): void => {
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 };
 
-export const getUser = (): any | null => {
+export const getUser = (): User | null => {
   const userData = localStorage.getItem(USER_KEY);
   return userData ? JSON.parse(userData) : null;
 };

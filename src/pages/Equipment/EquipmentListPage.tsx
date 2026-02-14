@@ -18,7 +18,7 @@ import DeleteConfirmModal from '../../components/Modal/DeleteConfirmModal'
 
 // Hooks & API
 import { useEquipmentList } from '../../hooks/useEquipmentList'
-import { STATUS_OPTIONS, CATEGORY_OPTIONS } from '../../constants/equipmentOptions'
+import { STATUS_OPTIONS, CATEGORY_OPTIONS, EXPIRY_FILTER_OPTIONS } from '../../constants/equipmentOptions'
 
 export default function EquipmentListPage() {
     const navigate = useNavigate()
@@ -41,6 +41,7 @@ export default function EquipmentListPage() {
     const [isFilterOpen, setIsFilterOpen] = useState(false)
     const [statusFilter, setStatusFilter] = useState<string>('')
     const [categoryFilter, setCategoryFilter] = useState<string>('ทั้งหมด')
+    const [expiryFilter, setExpiryFilter] = useState<string>('')
 
     // Modal state
     const [selectedEquipment, setSelectedEquipment] = useState<EquipmentListItem | null>(null)
@@ -66,7 +67,18 @@ export default function EquipmentListPage() {
     // Filter by category locally (since API doesn't support it yet)
     const filteredEquipment = equipment.filter(item => {
         const matchesCategory = categoryFilter === 'ทั้งหมด' || item.category === categoryFilter
-        return matchesCategory
+
+        // Expiry filter: ใช้ remain_life ที่ backend คำนวณแบบ dynamic
+        let matchesExpiry = true
+        if (expiryFilter === 'near_expiry') {
+            // ใกล้หมดอายุ: 0 < remain_life <= 1
+            matchesExpiry = item.remain_life !== undefined && item.remain_life > 0 && item.remain_life <= 1
+        } else if (expiryFilter === 'expired') {
+            // หมดอายุแล้ว: remain_life <= 0
+            matchesExpiry = item.remain_life !== undefined && item.remain_life <= 0
+        }
+
+        return matchesCategory && matchesExpiry
     })
 
     // Page change handler - preserve current search and status filters
@@ -192,7 +204,7 @@ export default function EquipmentListPage() {
 
                 {/* Filter Panel */}
                 {isFilterOpen && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-white border border-gray-200 rounded-xl">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-white border border-gray-200 rounded-xl">
                         <div>
                             <label className="block text-sm text-gray-600 mb-1.5">สถานะ</label>
                             <select
@@ -214,6 +226,18 @@ export default function EquipmentListPage() {
                             >
                                 {CATEGORY_OPTIONS.map(cat => (
                                     <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm text-gray-600 mb-1.5">สถานะอายุ</label>
+                            <select
+                                value={expiryFilter}
+                                onChange={(e) => setExpiryFilter(e.target.value)}
+                                className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none cursor-pointer"
+                            >
+                                {EXPIRY_FILTER_OPTIONS.map(opt => (
+                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
                                 ))}
                             </select>
                         </div>

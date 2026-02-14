@@ -6,7 +6,7 @@ import {
     HiOutlineArrowUpTray
 } from 'react-icons/hi2'
 
-import { JOB_STATUS_CONFIG } from '../../constants/mockData'
+import { ticketStatusConfig } from '../../types/ticket'
 import type { JobStatus } from '../../types/status'
 import type { JobStatusCount, RecentJob } from '../../types/dashboard'
 
@@ -94,7 +94,7 @@ function JobStatusSkeleton() {
 
 // Job Status Card Component
 function JobStatusCard({ status, count, delay }: { status: JobStatus, count: number, delay: number }) {
-    const config = JOB_STATUS_CONFIG[status]
+    const config = ticketStatusConfig[status]
     const Icon = iconMap[config.icon]
     const animatedCount = useCounter(count, 1200 + delay * 100)
 
@@ -157,7 +157,7 @@ export default function JobStatusSection({ jobStatusData, recentJobs, isLoading 
                     {jobs.slice(0, 3).map((job) => {
                         // Map API status to local JobStatus type
                         const jobStatus = job.status as JobStatus
-                        const config = JOB_STATUS_CONFIG[jobStatus] ?? JOB_STATUS_CONFIG['in_process']
+                        const config = ticketStatusConfig[jobStatus] ?? ticketStatusConfig['in_process']
                         const Icon = iconMap[config.icon]
                         return (
                             <div key={job.id} className="group flex items-center gap-3 p-2.5 -mx-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">

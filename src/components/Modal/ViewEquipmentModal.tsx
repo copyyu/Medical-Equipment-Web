@@ -1,5 +1,6 @@
 import { HiXMark } from 'react-icons/hi2'
-import { EQUIPMENT_STATUS_CONFIG, type EquipmentListItem, type EquipmentStatus } from '../../types/equipment'
+import { EQUIPMENT_STATUS_CONFIG } from '../../constants/equipmentOptions'
+import type { EquipmentListItem, EquipmentStatus } from '../../types/equipment'
 
 interface ViewEquipmentModalProps {
     equipment: EquipmentListItem | null

@@ -5,8 +5,8 @@ import { useState } from 'react'
 import StatCard from '../../components/Status/StatCard'
 import AssetStatusSection from '../../components/dashboard/AssetStatusSection'
 import JobStatusSection from '../../components/dashboard/JobStatusSection'
-// ✅ Import Component ใหม่เข้ามา
-import ExpiredEquipmentSection from '../../components/dashboard/ExpiredEquipmentSection'
+
+
 
 import { useDashboard } from '../../hooks/useDashboard'
 
@@ -14,7 +14,7 @@ export default function HomePage() {
   const { data, isLoading, error, refetch, lastUpdated } = useDashboard()
   const today = new Date().toISOString().split('T')[0]
   const [date, setDate] = useState(today)
-  
+
   // Format last updated time
   const formatLastUpdated = (date: Date | null) => {
     if (!date) return ''
@@ -47,7 +47,7 @@ export default function HomePage() {
   const statCardData = data ? {
     totalEquipment: data.total_equipment,
     // ✅ Mapping: ใช้ค่า rental_equipment (ที่ Backend ส่งมาเป็น expired count) มาใส่ตรงนี้
-    expiredEquipment: data.rental_equipment, 
+    expiredEquipment: data.rental_equipment,
     nearExpiry: data.near_expiry,
     totalMaintenance: data.total_maintenance
   } : null
@@ -89,10 +89,8 @@ export default function HomePage() {
         <StatCard data={statCardData} isLoading={isLoading} />
       </section>
 
-      {/* 2. ✅ Expired List Section (แสดงรายการที่หมดอายุ 5 รายการแรก) */}
-      <section className="animate-slide-up delay-100">
-         <ExpiredEquipmentSection />
-      </section>
+
+
 
       {/* 3. Charts & Status */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up delay-200">
