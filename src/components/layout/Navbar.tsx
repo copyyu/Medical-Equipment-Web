@@ -1,15 +1,23 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   HiOutlineBell,
   HiOutlineUser,
-  HiOutlineCog6Tooth,
   HiOutlineArrowRightOnRectangle,
   HiOutlineChevronDown
 } from 'react-icons/hi2'
+import { useAuthStore } from '../../stores/authStore'
 
 export default function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isNotificationOpen, setIsNotificationOpen] = useState(false)
+  const { user, logout } = useAuthStore()
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login')
+  }
 
   const notifications = [
     { id: 1, text: 'ผู้ใช้ใหม่ลงทะเบียนผ่าน LINE', time: '5 นาทีที่แล้ว', unread: true },
@@ -112,7 +120,7 @@ export default function Navbar() {
                 <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
               </div>
               <div className="hidden lg:block text-left">
-                <p className="text-sm font-medium text-gray-700">Admin</p>
+                <p className="text-sm font-medium text-gray-700">{user?.username || 'Admin'}</p>
                 <p className="text-xs text-gray-500">ผู้ดูแลระบบ</p>
               </div>
               <HiOutlineChevronDown className={`hidden lg:block w-4 h-4 text-gray-400 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
@@ -122,21 +130,14 @@ export default function Navbar() {
             {isProfileOpen && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-scale-in z-50">
                 <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
-                  <p className="font-semibold text-gray-900">Admin User</p>
-                  <p className="text-xs text-gray-500">admin@hospital.com</p>
+                  <p className="font-semibold text-gray-900">{user?.full_name || user?.username || 'Admin'}</p>
+                  <p className="text-xs text-gray-500">{user?.email || ''}</p>
                 </div>
                 <div className="py-2">
-                  <button className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                    <HiOutlineUser className="w-4 h-4 text-gray-400" />
-                    โปรไฟล์
-                  </button>
-                  <button className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                    <HiOutlineCog6Tooth className="w-4 h-4 text-gray-400" />
-                    ตั้งค่า
-                  </button>
-                </div>
-                <div className="border-t border-gray-100 py-2">
-                  <button className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
                     <HiOutlineArrowRightOnRectangle className="w-4 h-4" />
                     ออกจากระบบ
                   </button>
