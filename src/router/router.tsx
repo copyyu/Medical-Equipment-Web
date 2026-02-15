@@ -8,6 +8,7 @@ import HomePage from '../pages/HomePage/HomePage';
 import AddEquipmentPage from '../pages/Equipment/AddEquipmentPage';
 import TicketPage from '../pages/Ticket/TicketPage';
 import EquipmentListPage from '../pages/Equipment/EquipmentListPage';
+import ActivityLogPage from '../pages/ActivityLog/ActivityLogPage';
 
 export default function AppRouter() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -16,9 +17,9 @@ export default function AppRouter() {
     <Routes>
       {/* Auth Routes */}
       <Route element={<AuthLayout />}>
-        <Route 
-          path="/" 
-          element={isAuthenticated ? <Navigate to="/home" replace /> : <LoginPage />} 
+        <Route
+          path="/"
+          element={isAuthenticated ? <Navigate to="/home" replace /> : <LoginPage />}
         />
       </Route>
 
@@ -28,6 +29,7 @@ export default function AppRouter() {
         <Route path="/add-equipment" element={<AddEquipmentPage />} />
         <Route path="/equipment" element={<EquipmentListPage />} />
         <Route path="/ticket" element={<TicketPage />} />
+        <Route path="/activity-log" element={<ActivityLogPage />} />
       </Route>
 
       {/* Fallback */}

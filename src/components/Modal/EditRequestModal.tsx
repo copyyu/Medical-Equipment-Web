@@ -17,13 +17,14 @@ export default function EditRequestModal({ request, onClose, onSave }: EditReque
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const adminNote = (formData.get('note') as string)?.trim() || '';
 
     try {
       await updateTicket(request.id, {
         status: formData.get('status') as string,
         priority: formData.get('priority') as string,
         description: formData.get('description') as string,
-        note: 'Updated from admin panel'
+        note: adminNote
       });
 
       const updatedRequest: RequestItem = {
@@ -111,8 +112,22 @@ export default function EditRequestModal({ request, onClose, onSave }: EditReque
               <textarea
                 name="description"
                 defaultValue={request.description}
-                rows={4}
+                rows={3}
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
+            {/* Admin Note — จะแสดงในบันทึกการเปลี่ยนสถานะ */}
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                หมายเหตุของแอดมิน
+                <span className="text-gray-400 font-normal ml-1">(จะแสดงใน Activity Log)</span>
+              </label>
+              <textarea
+                name="note"
+                placeholder="เช่น ส่งซ่อมแล้ว, รอสั่งอะไหล่, ติดต่อผู้ใช้แล้ว..."
+                rows={2}
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder:text-gray-400"
               />
             </div>
           </div>
