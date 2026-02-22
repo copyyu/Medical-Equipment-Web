@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import authService from '../service/authService';
+import * as authService from '../service/authService';
 import type { AuthState, LoginCredentials } from '../types/auth';
-import { clearAuthData, getToken, getUser, setToken, setUser } from '../utils/auth';
+import { clearAuthData, getToken, getUser, isTokenExpired, setToken, setUser } from '../utils/auth';
 
 interface AuthStore extends AuthState {
   token: string | null;
@@ -84,7 +84,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const token = getToken();
       const user = getUser();
 
-      if (token && user) {
+      if (token && user && !isTokenExpired(token)) {
         set({
           user,
           token,
@@ -92,6 +92,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           isLoading: false,
         });
       } else {
+        // Token expired or missing — clear everything
+        clearAuthData();
         set({
           user: null,
           token: null,
@@ -100,6 +102,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         });
       }
     } catch (error) {
+      clearAuthData();
       set({
         user: null,
         token: null,

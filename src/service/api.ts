@@ -42,7 +42,7 @@ class ApiClient {
             // Handle 401 Unauthorized globally
             if (response.status === 401) {
                 removeToken();
-                window.location.href = '/login';
+                window.location.href = '/';
                 throw new Error('Session expired. Please login again.');
             }
 
@@ -100,7 +100,7 @@ class ApiClient {
         }).then(async (response) => {
             if (response.status === 401) {
                 removeToken();
-                window.location.href = '/login';
+                window.location.href = '/';
                 throw new Error('Session expired. Please login again.');
             }
 
