@@ -19,12 +19,6 @@ export default function Navbar() {
     navigate('/login')
   }
 
-  const notifications = [
-    { id: 1, text: 'ผู้ใช้ใหม่ลงทะเบียนผ่าน LINE', time: '5 นาทีที่แล้ว', unread: true },
-    { id: 2, text: 'สร้างรายงานประจำสัปดาห์เสร็จแล้ว', time: '1 ชั่วโมงที่แล้ว', unread: true },
-    { id: 3, text: 'อัพเดทระบบสำเร็จ v2.1.0', time: '2 ชั่วโมงที่แล้ว', unread: false },
-  ]
-
   return (
     <nav className="h-16 bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50 shadow-sm">
       {/* Gradient accent line */}
@@ -60,42 +54,17 @@ export default function Navbar() {
               className="relative p-2.5 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-all"
             >
               <HiOutlineBell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-gradient-primary rounded-full animate-pulse"></span>
             </button>
 
             {/* Notification Dropdown */}
             {isNotificationOpen && (
               <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-scale-in z-50">
                 <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900">การแจ้งเตือน</h3>
-                    <span className="px-2 py-0.5 bg-gradient-primary text-white text-xs rounded-full font-medium">
-                      2 ใหม่
-                    </span>
-                  </div>
+                  <h3 className="font-semibold text-gray-900">การแจ้งเตือน</h3>
                 </div>
-                <div className="max-h-80 overflow-y-auto">
-                  {notifications.map((notif) => (
-                    <div
-                      key={notif.id}
-                      className={`px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-50 last:border-0 ${notif.unread ? 'bg-accent-50/30' : ''}`}
-                    >
-                      <div className="flex gap-3">
-                        {notif.unread && (
-                          <div className="w-2 h-2 rounded-full bg-accent-500 mt-1.5 flex-shrink-0"></div>
-                        )}
-                        <div className={notif.unread ? '' : 'ml-5'}>
-                          <p className="text-sm text-gray-700">{notif.text}</p>
-                          <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="px-4 py-3 bg-gray-50 border-t border-gray-100">
-                  <button className="w-full text-center text-sm text-accent-600 hover:text-accent-700 font-medium">
-                    ดูทั้งหมด
-                  </button>
+                <div className="py-8 text-center">
+                  <HiOutlineBell className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-sm text-gray-400">ไม่มีการแจ้งเตือนใหม่</p>
                 </div>
               </div>
             )}
