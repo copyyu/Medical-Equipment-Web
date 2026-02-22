@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 
-import type { RequestItem } from '../../types/status';
+import type { RequestItem } from '../../types/ticket';
 import type { TicketListItem, TicketType, TicketStats } from '../../types/ticket';
 import TicketTable from '../../components/Table/TicketTable';
 import FilterBar from '../../components/filter/FilterBar';
@@ -24,7 +24,7 @@ export default function TicketPage() {
 
   const [stats, setStats] = useState<TicketStats>({
     total: 0,
-    in_process: 0,
+    inProcess: 0,
     completed: 0,
     sendToOutsource: 0,
   });

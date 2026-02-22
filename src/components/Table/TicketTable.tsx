@@ -1,5 +1,5 @@
 import { Search, Edit, Trash2, FileText, Calendar, Clock, AlertCircle, CheckCircle } from 'lucide-react';
-import type { RequestItem } from '../../types/status';
+import type { RequestItem } from '../../types/ticket';
 import { ticketStatusConfig, ticketTypeConfig, ticketPriorityConfig } from '../../types/ticket';
 
 interface RequestTableProps {

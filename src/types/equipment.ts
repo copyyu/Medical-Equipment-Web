@@ -1,11 +1,5 @@
-export type EquipmentStatus =
-  | 'active'
-  | 'defective'
-  | 'wait_decom'
-  | 'decommission'
-  | 'active_ready_to_sell'
-  | 'missing'
-  | 'plan_to_replace'
+// Re-export AssetStatus as EquipmentStatus for backward compatibility
+export type { AssetStatus as EquipmentStatus } from './status'
 
 
 
@@ -18,7 +12,7 @@ export interface EquipmentListItem {
   lastCheck: string
   expiry: string
   isExpiring?: boolean
-  remain_life?: number
+  remainLife?: number
 }
 
 

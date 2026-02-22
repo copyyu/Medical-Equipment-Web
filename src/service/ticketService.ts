@@ -229,7 +229,7 @@ export async function fetchTicketStats(): Promise<TicketStats> {
 
     return {
         total: result.data.total,
-        in_process: result.data.in_process,
+        inProcess: result.data.in_process,
         completed: result.data.completed,
         sendToOutsource: result.data.send_to_outsource
     };

@@ -40,8 +40,8 @@ export const CATEGORY_OPTIONS = [
 // Category options without "All" (for edit forms)
 export const CATEGORY_OPTIONS_NO_ALL = CATEGORY_OPTIONS.filter(cat => cat !== 'ทั้งหมด')
 
-// ✅✅ เพิ่มส่วนนี้เข้าไปครับ เพื่อให้ Table รู้ว่าจะแสดงสีอะไร ✅✅
-// ✅✅ เพิ่มส่วนนี้เข้าไปครับ เพื่อให้ Table รู้ว่าจะแสดงสีอะไร ✅✅
+// Equipment status display configuration (colors, icons, labels)
+
 export const EQUIPMENT_STATUS_CONFIG = {
     active: {
         label: 'Active',
