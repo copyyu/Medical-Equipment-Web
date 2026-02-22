@@ -36,7 +36,7 @@ export default function TicketStatCard({ stats }: StatsCardsProps) {
         let gradient = '';
 
         if (status === 'in_process') {
-          count = stats.in_process;
+          count = stats.inProcess;
           gradient = 'from-blue-500 to-blue-600';
         } else if (status === 'return_equipment_back') {
           count = stats.completed;

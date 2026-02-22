@@ -49,7 +49,7 @@ function mapApiItemToFrontend(item: EquipmentApiItem): EquipmentListItem {
     lastCheck: item.last_check,
     expiry: item.expiry,
     isExpiring: item.is_expiring,
-    remain_life: item.remain_life
+    remainLife: item.remain_life
   }
 }
 

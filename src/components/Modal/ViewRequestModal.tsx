@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import type { RequestItem } from '../../types/status';
+import type { RequestItem } from '../../types/ticket';
 import { ticketStatusConfig, ticketTypeConfig, ticketPriorityConfig, type TicketType, type TicketStatus, type TicketPriority } from '../../types/ticket';
 
 interface ViewRequestModalProps {

@@ -11,7 +11,8 @@ import {
 } from 'react-icons/hi2'
 
 // Components
-import EquipmentTable, { type EquipmentListItem } from '../../components/Table/EquipmentTable'
+import EquipmentTable from '../../components/Table/EquipmentTable'
+import type { EquipmentListItem } from '../../types/equipment'
 import ViewEquipmentModal from '../../components/Modal/ViewEquipmentModal'
 import EditEquipmentModal from '../../components/Modal/EditEquipmentModal'
 import DeleteConfirmModal from '../../components/Modal/DeleteConfirmModal'
@@ -72,10 +73,10 @@ export default function EquipmentListPage() {
         let matchesExpiry = true
         if (expiryFilter === 'near_expiry') {
             // ใกล้หมดอายุ: 0 < remain_life <= 1
-            matchesExpiry = item.remain_life !== undefined && item.remain_life > 0 && item.remain_life <= 1
+            matchesExpiry = item.remainLife !== undefined && item.remainLife > 0 && item.remainLife <= 1
         } else if (expiryFilter === 'expired') {
             // หมดอายุแล้ว: remain_life <= 0
-            matchesExpiry = item.remain_life !== undefined && item.remain_life <= 0
+            matchesExpiry = item.remainLife !== undefined && item.remainLife <= 0
         }
 
         return matchesCategory && matchesExpiry

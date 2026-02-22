@@ -5,19 +5,8 @@ import {
     HiOutlineMagnifyingGlass
 } from 'react-icons/hi2'
 import { EQUIPMENT_STATUS_CONFIG } from '../../constants/equipmentOptions'
+import type { EquipmentListItem } from '../../types/equipment'
 
-// ประกาศ Interface
-export interface EquipmentListItem {
-    id: string
-    name: string
-    category: string
-    status: string // ถ้าแก้ Type ในไฟล์อื่นแล้ว ให้เปลี่ยนเป็น EquipmentStatus ได้
-    location: string
-    lastCheck: string
-    expiry: string
-    isExpiring?: boolean
-    remain_life?: number
-}
 
 interface EquipmentTableProps {
     data: EquipmentListItem[]
@@ -29,8 +18,8 @@ interface EquipmentTableProps {
 
 const getExpiryStatus = (remainLife?: number) => {
     if (remainLife === undefined || remainLife === null) return 'ok'
-    if (remainLife <= 0) return 'expired'       // หมดอายุแล้ว (remain_life <= 0)
-    if (remainLife <= 1) return 'expiring'       // ใกล้หมดอายุ (0 < remain_life <= 1)
+    if (remainLife <= 0) return 'expired'       // หมดอายุแล้ว (remainLife <= 0)
+    if (remainLife <= 1) return 'expiring'       // ใกล้หมดอายุ (0 < remainLife <= 1)
     return 'ok'                                  // ปกติ
 }
 
@@ -71,7 +60,7 @@ export default function EquipmentTable({ data, total, onView, onEdit, onDelete }
                                 textColor: 'text-gray-800'
                             }
 
-                            const expiryStatus = getExpiryStatus(item.remain_life)
+                            const expiryStatus = getExpiryStatus(item.remainLife)
 
                             return (
                                 <tr key={item.id} className="hover:bg-gray-50 transition-colors group">
@@ -104,7 +93,7 @@ export default function EquipmentTable({ data, total, onView, onEdit, onDelete }
                                                 {item.expiry}
                                             </span>
 
-                                            {/* ✅✅ แก้กลับเป็นแบบเดิม (ป้ายข้อความ) ✅✅ */}
+                                            {/* Expiry status badges */}
                                             {expiryStatus === 'expired' && (
                                                 <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded">หมดอายุ</span>
                                             )}

@@ -1,7 +1,7 @@
 import { X } from 'lucide-react';
 import { updateTicket } from '../../service/ticketService';
 import { ticketStatusConfig, ticketPriorityConfig, type TicketPriority, type TicketStatus } from '../../types/ticket';
-import type { RequestItem } from '../../types/status';
+import type { RequestItem } from '../../types/ticket';
 
 interface EditRequestModalProps {
   request: RequestItem | null;

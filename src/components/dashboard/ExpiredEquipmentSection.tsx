@@ -1,34 +1,34 @@
 import { useNavigate } from 'react-router-dom'
 import { HiOutlineChevronRight, HiOutlineExclamationCircle } from 'react-icons/hi2'
 import { useEquipmentList } from '../../hooks/useEquipmentList'
-import type { EquipmentListItem } from '../Table/EquipmentTable' // Import Type ถ้าจำเป็น
+import type { EquipmentListItem } from '../../types/equipment'
 
 // ฟังก์ชันตรวจสอบวันหมดอายุ
 const isExpired = (item: EquipmentListItem) => {
-    // ถ้ามี field remainLife ส่งมาจาก Backend
-    if (typeof item.remain_life !== 'undefined') {
-        return item.remain_life <= 0
-    }
-    // กรณีไม่มีข้อมูล ให้ถือว่าไม่หมดอายุไว้ก่อน
-    return false 
+  // ถ้ามี field remainLife ส่งมาจาก Backend
+  if (typeof item.remainLife !== 'undefined') {
+    return item.remainLife <= 0
+  }
+  // กรณีไม่มีข้อมูล ให้ถือว่าไม่หมดอายุไว้ก่อน
+  return false
 }
 
 export default function ExpiredEquipmentSection() {
   const navigate = useNavigate()
-  
+
   // เรียก API ดึงข้อมูลอุปกรณ์ (ดึงมา 50 ตัวเผื่อไว้กรอง)
   const { data: equipment, isLoading } = useEquipmentList({ page: 1, limit: 50 })
 
   // กรองเฉพาะรายการที่ "หมดอายุ" และตัดมาแค่ 5 รายการแรก
   const expiredList = equipment
-    .filter(item => isExpired(item)) 
+    .filter(item => isExpired(item))
     .slice(0, 5)
 
   // Loading State
   if (isLoading) return <div className="h-48 bg-gray-100 rounded-xl animate-pulse mt-6" />
 
   // ถ้าไม่มีข้อมูลหมดอายุเลย ให้ซ่อน Section นี้ไปเลย
-  if (expiredList.length === 0) return null 
+  if (expiredList.length === 0) return null
 
   return (
     <div className="bg-white border border-red-100 rounded-2xl shadow-sm overflow-hidden mt-6">
@@ -43,9 +43,9 @@ export default function ExpiredEquipmentSection() {
             <p className="text-xs text-red-600 font-medium">ควรดำเนินการจำหน่ายออก หรือตรวจสอบสภาพ</p>
           </div>
         </div>
-        <button 
+        <button
           // ลิงก์ไปหน้ารายการ (คุณอาจต้องเขียน Logic เพิ่มในหน้านั้นให้รับ filter)
-          onClick={() => navigate('/equipment')} 
+          onClick={() => navigate('/equipment')}
           className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-1 bg-white px-3 py-1.5 rounded-lg border border-red-100 shadow-sm hover:shadow"
         >
           ดูทั้งหมด <HiOutlineChevronRight className="w-4 h-4" />
@@ -72,9 +72,9 @@ export default function ExpiredEquipmentSection() {
                   </div>
                 </td>
                 <td className="px-6 py-3 text-gray-600">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                        {item.location}
-                    </span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                    {item.location}
+                  </span>
                 </td>
                 <td className="px-6 py-3 text-right">
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200">
