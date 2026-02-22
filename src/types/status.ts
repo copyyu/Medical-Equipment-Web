@@ -1,3 +1,5 @@
+// ===== Status Types (Single Source of Truth) =====
+
 // Asset Status Types
 export type AssetStatus =
   | 'active'
@@ -42,35 +44,3 @@ export interface StatusCount<T> {
   status: T
   count: number
 }
-
-// Recent Job
-export interface RecentJob {
-  id: string
-  equipmentName: string
-  status: JobStatus
-  assignee: string
-  updatedAt: string
-}
-
-export type { RequestItem } from './ticket';
-
-export const requestTypeConfig = {
-  repair: { label: 'แจ้งซ่อม', color: 'bg-orange-100 text-orange-700' },
-  maintenance: { label: 'บำรุงรักษา', color: 'bg-blue-100 text-blue-700' },
-  inspection: { label: 'สอบถามการใช้งาน', color: 'bg-teal-100 text-teal-700' },
-  other: { label: 'อื่นๆ', color: 'bg-gray-100 text-gray-700' },
-};
-
-export const priorityConfig = {
-  low: { label: 'ต่ำ', color: 'bg-gray-100 text-gray-600' },
-  medium: { label: 'ปานกลาง', color: 'bg-blue-100 text-blue-700' },
-  high: { label: 'สูง', color: 'bg-orange-100 text-orange-700' },
-  urgent: { label: 'เร่งด่วน', color: 'bg-red-100 text-red-700' },
-};
-
-export const statusConfig = {
-  pending: { label: 'รอดำเนินการ', color: 'bg-yellow-100 text-yellow-700' },
-  'in-progress': { label: 'กำลังดำเนินการ', color: 'bg-blue-100 text-blue-700' },
-  completed: { label: 'เสร็จสิ้น', color: 'bg-emerald-100 text-emerald-700' },
-  rejected: { label: 'ปฏิเสธ', color: 'bg-red-100 text-red-700' },
-};

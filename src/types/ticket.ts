@@ -164,7 +164,7 @@ export interface TicketHistory {
 // Ticket Stats
 export interface TicketStats {
     total: number;
-    in_process: number;
+    inProcess: number;
     completed: number;
     sendToOutsource: number;
 }

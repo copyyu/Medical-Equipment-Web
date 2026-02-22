@@ -1,26 +1,13 @@
 // Dashboard API Response Types
-
-export type AssetStatusType =
-    | 'active'
-    | 'defective'
-    | 'wait_decom'
-    | 'decommission'
-    | 'active_ready_to_sell'
-    | 'missing'
-    | 'plan_to_replace'
-
-export type JobStatusType =
-    | 'in_process'
-    | 'return_equipment_back'
-    | 'send_to_outsource'
+import type { AssetStatus, JobStatus } from './status'
 
 export interface AssetStatusCount {
-    status: AssetStatusType
+    status: AssetStatus
     count: number
 }
 
 export interface JobStatusCount {
-    status: JobStatusType
+    status: JobStatus
     count: number
 }
 
@@ -41,5 +28,3 @@ export interface DashboardSummary {
     job_status_counts: JobStatusCount[]
     recent_jobs: RecentJob[]
 }
-
-
