@@ -1,16 +1,8 @@
-@import "tailwindcss";
-
 /* Google Fonts - Inter + Outfit */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
 
-/* ============================================
-   Medical Equipment Admin - Premium Enterprise Design
-   Glassmorphism + Gradients + Animations
-   ============================================ */
+@import "tailwindcss";
 
-/* ============================================
-   CSS Variables - Premium Corporate Palette
-   ============================================ */
 :root {
   /* Primary - Deep Slate Blue */
   --primary-50: #f8fafc;
