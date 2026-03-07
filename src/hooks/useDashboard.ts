@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { DashboardSummary } from '../types/dashboard'
 import { fetchDashboardSummary } from '../service/dashboardService'
+import { useEventStream } from './useEventStream'
 
 interface UseDashboardResult {
     data: DashboardSummary | null
@@ -8,17 +9,14 @@ interface UseDashboardResult {
     error: string | null
     refetch: () => Promise<void>
     lastUpdated: Date | null
+    isLive: boolean
 }
-
-// Auto refresh interval in milliseconds (30 seconds)
-const AUTO_REFRESH_INTERVAL = 30000
 
 export function useDashboard(): UseDashboardResult {
     const [data, setData] = useState<DashboardSummary | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
-    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
     const fetchData = useCallback(async () => {
         try {
@@ -39,19 +37,25 @@ export function useDashboard(): UseDashboardResult {
         fetchData()
     }, [fetchData])
 
-    // Auto refresh every 30 seconds
-    useEffect(() => {
-        intervalRef.current = setInterval(() => {
+    // Subscribe to real-time events — auto-refetch when data changes
+    const { isConnected } = useEventStream({
+        eventTypes: [
+            'equipment.created',
+            'equipment.updated',
+            'equipment.deleted',
+            'ticket.created',
+            'ticket.updated',
+        ],
+        onEvent: () => {
+            // Re-fetch dashboard data whenever any event arrives
             fetchData()
-        }, AUTO_REFRESH_INTERVAL)
+        },
+        onReconnect: () => {
+            // Re-fetch after reconnect to sync any events missed during disconnect
+            fetchData()
+        },
+    })
 
-        // Cleanup on unmount
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current)
-            }
-        }
-    }, [fetchData])
-
-    return { data, isLoading, error, refetch: fetchData, lastUpdated }
+    return { data, isLoading, error, refetch: fetchData, lastUpdated, isLive: isConnected }
 }
+

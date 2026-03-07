@@ -2,10 +2,16 @@ import type { User } from '../types/auth';
 
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'user_data';
+const TOKEN_CREATED_KEY = 'token_created_at';
+
+// Token expiry must match backend: 24 hours (admin_service.go line 115)
+const TOKEN_EXPIRY_HOURS = 24;
 
 // Token Management
 export const setToken = (token: string): void => {
   localStorage.setItem(TOKEN_KEY, token);
+  // Store creation timestamp for expiry tracking
+  localStorage.setItem(TOKEN_CREATED_KEY, Date.now().toString());
 };
 
 export const getToken = (): string | null => {
@@ -14,17 +20,18 @@ export const getToken = (): string | null => {
 
 export const removeToken = (): void => {
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(TOKEN_CREATED_KEY);
 };
 
-// Check if JWT token is expired
-export const isTokenExpired = (token: string): boolean => {
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    if (!payload.exp) return false; // No expiry claim — treat as not expired
-    return Date.now() >= payload.exp * 1000;
-  } catch {
-    return true; // Malformed token — treat as expired
-  }
+// Check if token is expired based on stored creation timestamp
+// Backend uses random base64 tokens (NOT JWT), so we track expiry client-side
+export const isTokenExpired = (_token: string): boolean => {
+  const createdAt = localStorage.getItem(TOKEN_CREATED_KEY);
+  if (!createdAt) return false; // No timestamp = legacy token, let server decide
+
+  const elapsed = Date.now() - parseInt(createdAt, 10);
+  const expiryMs = TOKEN_EXPIRY_HOURS * 60 * 60 * 1000;
+  return elapsed >= expiryMs;
 };
 
 // User Data Management
