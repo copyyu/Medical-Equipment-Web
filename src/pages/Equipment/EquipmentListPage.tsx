@@ -57,29 +57,20 @@ export default function EquipmentListPage() {
                 page: 1,
                 limit: itemsPerPage,
                 search: searchTerm || undefined,
-                status: statusFilter || undefined
+                status: statusFilter || undefined,
+                expiry_filter: expiryFilter || undefined
             })
         }, 300) // Debounce search
 
         return () => clearTimeout(debounceTimer)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchTerm, statusFilter])
+    }, [searchTerm, statusFilter, expiryFilter])
 
     // Filter by category locally (since API doesn't support it yet)
+    // Note: expiry filter is now handled server-side
     const filteredEquipment = equipment.filter(item => {
         const matchesCategory = categoryFilter === 'ทั้งหมด' || item.category === categoryFilter
-
-        // Expiry filter: ใช้ remain_life ที่ backend คำนวณแบบ dynamic
-        let matchesExpiry = true
-        if (expiryFilter === 'near_expiry') {
-            // ใกล้หมดอายุ: 0 < remain_life <= 1
-            matchesExpiry = item.remainLife !== undefined && item.remainLife > 0 && item.remainLife <= 1
-        } else if (expiryFilter === 'expired') {
-            // หมดอายุแล้ว: remain_life <= 0
-            matchesExpiry = item.remainLife !== undefined && item.remainLife <= 0
-        }
-
-        return matchesCategory && matchesExpiry
+        return matchesCategory
     })
 
     // Page change handler - preserve current search and status filters
@@ -88,7 +79,8 @@ export default function EquipmentListPage() {
             page: newPage,
             limit: itemsPerPage,
             search: searchTerm || undefined,
-            status: statusFilter || undefined
+            status: statusFilter || undefined,
+            expiry_filter: expiryFilter || undefined
         })
     }
 
