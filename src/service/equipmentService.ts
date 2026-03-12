@@ -36,6 +36,7 @@ export interface EquipmentListParams {
   search?: string
   sort_by?: string
   sort_dir?: string
+  expiry_filter?: string
 }
 
 // Map API item to frontend EquipmentListItem
@@ -210,6 +211,7 @@ export async function fetchEquipmentList(params: EquipmentListParams = {}): Prom
   if (params.search) queryParams.append('search', params.search)
   if (params.sort_by) queryParams.append('sort_by', params.sort_by)
   if (params.sort_dir) queryParams.append('sort_dir', params.sort_dir)
+  if (params.expiry_filter) queryParams.append('expiry_filter', params.expiry_filter)
 
   const response = await api.get<ApiResponse<EquipmentListResponse>>(`/api/equipment?${queryParams.toString()}`)
 
