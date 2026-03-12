@@ -14,34 +14,67 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
   // Modal states
   const [showResultModal, setShowResultModal] = useState<boolean>(false);
   const [importResult, setImportResult] = useState<EquipmentImportResult | null>(null);
-
+  const [detectedHeaders, setDetectedHeaders] = useState<string[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const downloadTemplate = () => {
     const template = [
       {
-        'รหัสอุปกรณ์': 'EQ-2024-001',
-        'หมายเลขเครื่อง': 'SN123456789',
-        'รหัสการประเมิน': 'ASSESS-2024-001',
-        'แผนก': 'Radiology',
-        'หมวดหมู่': 'MRI Scanner',
-        'ยี่ห้อ': 'Siemens',
-        'รุ่น': 'MAGNETOM Sola',
-        'วันที่รับอุปกรณ์': '2020-01-15',
-        'ราคาซื้อ': '2500000',
-        'อายุการใช้งาน': '10',
-        'อายุเครื่อง': '5.05',
-        'วันที่คำนวณ': '2025-02-02',
-        'อายุคงเหลือ': '4.95',
-        '%การใช้งาน': '50.50',
-        'ปีที่ต้องเปลี่ยน': '2030',
-        'คะแนนเทคโนโลยี': '4.5',
-        'คะแนนสถิติการใช้งาน': '4.0',
-        'คะแนนประสิทธิภาพ': '4.2',
-        'หมายเหตุ': 'Regular maintenance required',
-        'ECRI Risk': 'HIGH',
-        'Classification': 'Class IIb Medical Device'
+        'id_code': 'EQ-2024-001',
+        'serial_no': 'SN123456789',
+        'department': 'Radiology',
+        'brand': 'Siemens',
+        'model': 'MAGNETOM Sola',
+        'category': 'MRI Scanner',
+        'status': 'active',
+        'asset_type_name': 'Medical Device',
+        'asset_name': 'MRI Scanner Sola',
+        'asset_id': 'AST-1001',
+        'ecri_code': '12-345',
+        'asset_status_internal': 'In-Use',
+        'rental_status': 'None',
+        'borrow_status': 'None',
+        'building': 'Main',
+        'floor': '1st',
+        'room': 'R-101',
+        'phone_no': '02-123-4567',
+        'business_name': 'General Hospital',
+        'item_no': 'ITM-001',
+        'sku_no': 'SKU-001',
+        'receive_date': '2024-01-15',
+        'purchase_date': '2024-01-01',
+        'registration_date': '2024-01-10',
+        'purchase_price': 2500000,
+        'revenue_per_month': 0,
+        'life_expectancy': 10,
+        'warranty_period': '1 Year',
+        'warranty_start_date': '2024-01-15',
+        'warranty_end_date': '2025-01-15',
+        'warranty_pm': 'Included',
+        'warranty_cal': 'Included',
+        'last_pm_date': '2024-06-15',
+        'last_cal_date': '2024-06-15',
+        'pm_period': '6 Months',
+        'cal_period': '1 Year',
+        'vendor_pm': 'Siemens Service',
+        'vendor_cal': 'Siemens Service',
+        'power_consumption': '10KW',
+        'supplier': 'Siemens Healthcare',
+        'ownership': 'Owned',
+        'manufacturing_country': 'Germany',
+        'po_no': 'PO-2024-001',
+        'contract_no': 'CONT-2024-001',
+        'invoice_no': 'INV-2024-001',
+        'document_no': 'DOC-2024-001',
+        'tor_no': 'TOR-2024-001',
+        'nsmart_item_code': 'NS-MRI-001',
+        'technology': 5,
+        'usage_statistics': 4,
+        'efficiency': 5,
+        'others': 'Needs stable power',
+        'remark': 'Installed successfully',
+        'approved_by': 'Director'
       }
     ];
 
@@ -49,22 +82,11 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Template');
 
-    const wscols = [
-      { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 20 },
-      { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 },
-      { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 15 },
-      { wch: 12 }, { wch: 12 }, { wch: 15 }, { wch: 15 },
-      { wch: 20 }, { wch: 15 }, { wch: 30 }, { wch: 12 },
-      { wch: 25 }
-    ];
-    ws['!cols'] = wscols;
 
     XLSX.writeFile(wb, 'equipment_import_template.xlsx');
   };
 
-  const getColumnValue = (row: any, thaiName: string, englishName: string): any => {
-    return row[thaiName] || row[englishName] || '';
-  };
+
 
   const parseExcelDate = (dateValue: any): string => {
     if (!dateValue) return '';
@@ -107,32 +129,74 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
+      // Detect actual column headers from the Excel file
+      if (jsonData.length > 0) {
+        const headers = Object.keys(jsonData[0] as any);
+        setDetectedHeaders(headers);
+        console.log('📋 Detected Excel headers:', headers);
+        console.log('📋 First row data:', jsonData[0]);
+      }
+
       const mappedData: ExcelData[] = jsonData.map((row: any) => {
+        const get = (...keys: string[]): any => {
+          for (const key of keys) {
+            if (row[key] !== undefined && row[key] !== null) return row[key];
+          }
+          return '';
+        };
+
         const mapped: ExcelData = {
-          idCode: getColumnValue(row, 'รหัสอุปกรณ์', 'ID CODE'),
-          serialNo: getColumnValue(row, 'หมายเลขเครื่อง', 'Serial No'),
-          assessmentId: getColumnValue(row, 'รหัสการประเมิน', 'Assessment ID'),
-          department: getColumnValue(row, 'แผนก', 'Department'),
-          category: getColumnValue(row, 'หมวดหมู่', 'Equipment Category'),
-          brand: getColumnValue(row, 'ยี่ห้อ', 'Brand'),
-          model: getColumnValue(row, 'รุ่น', 'Model'),
-          receiveDate: parseExcelDate(getColumnValue(row, 'วันที่รับอุปกรณ์', 'Receive Date')),
-          purchasePrice: parseFloat(getColumnValue(row, 'ราคาซื้อ', 'Purchase price')) || 0,
-          lifeExpectancy: parseFloat(getColumnValue(row, 'อายุการใช้งาน', 'Life Expect')) || 10,
-          equipmentAge: parseFloat(getColumnValue(row, 'อายุเครื่อง', 'Equipment Age')) || 0,
-          computeDate: parseExcelDate(getColumnValue(row, 'วันที่คำนวณ', 'Compute Date')),
-          remainLife: parseFloat(getColumnValue(row, 'อายุคงเหลือ', 'Remain Life')) || 0,
-          usefulLifetimePercent: parseFloat(getColumnValue(row, '%การใช้งาน', '% of useful lifetime')) || 0,
-          replacementYear: parseInt(getColumnValue(row, 'ปีที่ต้องเปลี่ยน', 'Replacement Year')) || 0,
-          technology: row['คะแนนเทคโนโลยี'] ? parseFloat(row['คะแนนเทคโนโลยี']) : null,
-          usageStatistics: row['คะแนนสถิติการใช้งาน'] ? parseFloat(row['คะแนนสถิติการใช้งาน']) : null,
-          efficiency: row['คะแนนประสิทธิภาพ'] ? parseFloat(row['คะแนนประสิทธิภาพ']) : null,
-          others: getColumnValue(row, 'หมายเหตุ', 'Note'),
-          ecriRisk: row['ECRI Risk'] || '',
-          classification: row['Classification'] || '',
-          totalCM: row['Total of CM'] ? parseInt(row['Total of CM']) : undefined,
-          totalCost: row['Total Cost'] ? parseFloat(row['Total Cost']) : undefined,
-          perCostPrice: row['Per Cost Price'] ? parseFloat(row['Per Cost Price']) : undefined
+          idCode: get('id_code', 'ID Code', 'ID CODE', 'รหัสอุปกรณ์', 'idCode'),
+          serialNo: get('serial_no', 'Serial Number', 'Serial No', 'หมายเลขเครื่อง', 'serialNo'),
+          department: get('department', 'Department Name', 'Department', 'แผนก'),
+          brand: get('brand', 'Brand Name', 'Brand', 'ยี่ห้อ'),
+          model: get('model', 'Model Name', 'Model', 'รุ่น'),
+          category: get('category', 'Category', 'Equipment Category', 'หมวดหมู่'),
+          status: get('status', 'Asset Status', 'Status', 'สถานะ') || 'active',
+          assetTypeName: get('asset_type_name', 'Asset Type Name', 'Asset Type', 'ประเภททรัพย์สิน'),
+          assetName: get('asset_name', 'Asset Name', 'ชื่อทรัพย์สิน'),
+          assetId: get('asset_id', 'Asset ID', 'รหัสทรัพย์สิน'),
+          ecriCode: get('ecri_code', 'ECRI Code', 'รหัส ECRI'),
+          assetStatusInternal: get('asset_status_internal', 'Asset Status Internal', 'สถานะทรัพย์สิน'),
+          rentalStatus: get('rental_status', 'Rental Status', 'สถานะการเช่า'),
+          borrowStatus: get('borrow_status', 'Borrow status', 'Borrow Status', 'สถานะการยืม'),
+          building: get('building', 'Building', 'อาคาร'),
+          floor: get('floor', 'Floor', 'ชั้น'),
+          room: get('room', 'Room', 'ห้อง'),
+          phoneNo: get('phone_no', 'Phone No', 'Phone', 'เบอร์โทรศัพท์'),
+          businessName: get('business_name', 'Business Name', 'ชื่อธุรกิจ'),
+          itemNo: get('item_no', 'Item No', 'หมายเลขไอเท็ม'),
+          skuNo: get('sku_no', 'SKU No', 'รหัส SKU'),
+          receiveDate: parseExcelDate(get('receive_date', 'Receive Date', 'วันที่รับอุปกรณ์')),
+          purchaseDate: parseExcelDate(get('purchase_date', 'Purchase Date', 'วันที่ซื้อ')),
+          registrationDate: parseExcelDate(get('registration_date', 'Registration Date', 'Registeration Date', 'วันที่ลงทะเบียน')),
+          purchasePrice: parseFloat(get('purchase_price', 'Price', 'Purchase Price', 'ราคาซื้อ')) || 0,
+          revenuePerMonth: parseFloat(get('revenue_per_month', 'Revenue Per Month', 'รายได้ต่อเดือน')) || '',
+          lifeExpectancy: parseFloat(get('life_expectancy', 'Estimated Use Life', 'Life Expectancy', 'Life Expect', 'อายุการใช้งาน')) || 10,
+          warrantyPeriod: get('warranty_period', 'Warranty Period', 'ระยะเวลารับประกัน'),
+          warrantyStartDate: parseExcelDate(get('warranty_start_date', 'Warranty Start Date', 'Warranty Start', 'วันเริ่มรับประกัน')),
+          warrantyEndDate: parseExcelDate(get('warranty_end_date', 'Warranty End Date', 'Warranty End', 'วันสิ้นสุดรับประกัน')),
+          warrantyPm: get('warranty_pm', 'Warranty PM', 'PM การรับประกัน'),
+          warrantyCal: get('warranty_cal', 'Warranty Cal', 'Warranty CAL', 'CAL การรับประกัน'),
+          lastPmDate: parseExcelDate(get('last_pm_date', 'Last PM Date', 'วันที่ PM ล่าสุด')),
+          lastCalDate: parseExcelDate(get('last_cal_date', 'Last Cal Date', 'Last CAL Date', 'วันที่ CAL ล่าสุด')),
+          pmPeriod: get('pm_period', 'PM Period', 'รอบ PM'),
+          calPeriod: get('cal_period', 'Cal Period', 'CAL Period', 'รอบ CAL'),
+          vendorPm: get('vendor_pm', 'Vendor PM'),
+          vendorCal: get('vendor_cal', 'Vendor Cal', 'Vendor CAL'),
+          powerConsumption: get('power_consumption', 'Power Consumption', 'การใช้พลังงาน'),
+          supplier: get('supplier', 'Supplier', 'ซัพพลายเออร์'),
+          ownership: get('ownership', 'Ownership', 'กรรมสิทธิ์'),
+          manufacturingCountry: get('manufacturing_country', 'Manufacturing Country', 'ประเทศที่ผลิต'),
+          poNo: get('po_no', 'Po No', 'PO No.', 'PO No'),
+          contractNo: get('contract_no', 'Contract No', 'Contract No.'),
+          invoiceNo: get('invoice_no', 'Invoice No', 'Invoice No.'),
+          documentNo: get('document_no', 'Document No', 'Document No.'),
+          torNo: get('tor_no', 'Tor No', 'TOR No.', 'TOR No'),
+          nsmartItemCode: get('nsmart_item_code', 'Nsmart Item Code', 'NSMART Item Code'),
+          remark: get('remark', 'Remark', 'หมายเหตุ'),
+          approvedBy: get('approved_by', 'Approved By', 'ผู้อนุมัติ'),
+          updatedBy: get('updated_by', 'Updated By', 'ผู้แก้ไขล่าสุด'),
         };
         return mapped;
       });
@@ -285,6 +349,12 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
                 พบข้อมูล {previewData.length} รายการพร้อมนำเข้า
               </p>
             </div>
+            {detectedHeaders.length > 0 && (
+              <div className="mt-2 text-xs text-gray-500">
+                <p className="font-medium">📋 Column headers ที่ตรวจพบในไฟล์:</p>
+                <p className="mt-1 break-all">{detectedHeaders.join(', ')}</p>
+              </div>
+            )}
           </div>
 
           {/* Preview Table */}
@@ -304,11 +374,11 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
                 {previewData.slice(0, 5).map((item, index) => (
                   <tr key={index} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm text-gray-900">{index + 1}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{item.idCode}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{item.serialNo}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{item.department}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{item.brand}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{item.model}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{String(item.idCode)}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{String(item.serialNo)}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{String(item.department)}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{String(item.brand)}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{String(item.model)}</td>
                   </tr>
                 ))}
               </tbody>
