@@ -55,29 +55,63 @@ function mapApiItemToFrontend(item: EquipmentApiItem): EquipmentListItem {
 
 export function mapFormDataToRequest(formData: EquipmentFormData): CreateEquipmentRequest {
   const request: CreateEquipmentRequest = {
-    // Required fields
+    // Required fields 
     id_code: formData.idCode,
     serial_no: formData.serialNo,
     department: formData.department,
     brand: formData.brand,
     model: formData.model,
     category: formData.category,
-    receive_date: formData.receiveDate,
-    purchase_price: formData.purchasePrice,
-    equipment_age: formData.equipmentAge,
-    life_expectancy: formData.lifeExpectancy,
-    remain_life: formData.remainLife,
-    useful_lifetime_percent: formData.usefulLifetimePercent,
-  };
+    status: formData.status || 'active', // Default to active if empty
 
-  // Optional fields
-  if (formData.assessmentId) request.assessment_id = formData.assessmentId;
-  if (formData.computeDate) request.compute_date = formData.computeDate;
-  if (formData.replacementYear && formData.replacementYear > 0) request.replacement_year = formData.replacementYear;
-  if (formData.technology !== null && formData.technology !== undefined) request.technology = formData.technology;
-  if (formData.usageStatistics !== null && formData.usageStatistics !== undefined) request.usage_statistics = formData.usageStatistics;
-  if (formData.efficiency !== null && formData.efficiency !== undefined) request.efficiency = formData.efficiency;
-  if (formData.others) request.others = formData.others;
+    // Optional / Map other fields directly
+    asset_type_name: formData.assetTypeName,
+    asset_name: formData.assetName,
+    asset_id: formData.assetId,
+    ecri_code: formData.ecriCode,
+    asset_status_internal: formData.assetStatusInternal,
+    rental_status: formData.rentalStatus,
+    borrow_status: formData.borrowStatus,
+    building: formData.building,
+    floor: formData.floor,
+    room: formData.room,
+    phone_no: formData.phoneNo,
+    business_name: formData.businessName,
+    item_no: formData.itemNo,
+    sku_no: formData.skuNo,
+    receive_date: formData.receiveDate,
+    purchase_date: formData.purchaseDate,
+    registration_date: formData.registrationDate,
+    warranty_period: formData.warrantyPeriod,
+    warranty_start_date: formData.warrantyStartDate,
+    warranty_end_date: formData.warrantyEndDate,
+    warranty_pm: formData.warrantyPm,
+    warranty_cal: formData.warrantyCal,
+    last_pm_date: formData.lastPmDate,
+    last_cal_date: formData.lastCalDate,
+    pm_period: formData.pmPeriod,
+    cal_period: formData.calPeriod,
+    vendor_pm: formData.vendorPm,
+    vendor_cal: formData.vendorCal,
+    power_consumption: formData.powerConsumption,
+    supplier: formData.supplier,
+    ownership: formData.ownership,
+    po_no: formData.poNo,
+    contract_no: formData.contractNo,
+    invoice_no: formData.invoiceNo,
+    document_no: formData.documentNo,
+    tor_no: formData.torNo,
+    manufacturing_country: formData.manufacturingCountry,
+    remark: formData.remark,
+    approved_by: formData.approvedBy,
+    nsmart_item_code: formData.nsmartItemCode,
+    updated_by: formData.updatedBy,
+
+    // Financial/Numbers
+    purchase_price: formData.purchasePrice === '' ? 0 : formData.purchasePrice,
+    revenue_per_month: formData.revenuePerMonth === '' ? null : formData.revenuePerMonth,
+    life_expectancy: formData.lifeExpectancy === '' ? 10 : formData.lifeExpectancy,
+  };
 
   return request;
 }
@@ -86,25 +120,78 @@ export function mapResponseToFormData(
   response: EquipmentResponse
 ): EquipmentFormData {
   return {
+    // Basic Info
     idCode: response.id_code,
     serialNo: response.serial_no || '',
-    assessmentId: response.assessment_id || '',
     department: response.department?.department_name || '',
     brand: response.model?.brand?.brand_name || '',
     model: response.model?.model_name || '',
     category: response.model?.category?.category_name || '',
+    status: response.status || 'active',
+    assetTypeName: '', // Cannot map from current EquipmentResponse type without new backend fields
+    assetName: '',     // Update mapping as backend EquipmentResponse object evolves
+    assetId: '',
+    ecriCode: '',
+
+    // Status & Location
+    assetStatusInternal: '',
+    rentalStatus: '',
+    borrowStatus: '',
+    building: '',
+    floor: '',
+    room: '',
+    phoneNo: '',
+
+    // Business & Item Info
+    businessName: '',
+    itemNo: '',
+    skuNo: '',
+
+    // Dates
     receiveDate: response.receive_date ? response.receive_date.split('T')[0] : '',
-    purchasePrice: response.purchase_price || 0,
-    equipmentAge: response.equipment_age || 0,
-    computeDate: response.compute_date ? response.compute_date.split('T')[0] : '',
+    purchaseDate: '',
+    registrationDate: '',
+
+    // Financial
+    purchasePrice: response.purchase_price || '',
+    revenuePerMonth: '',
+
+    // Lifecycle
     lifeExpectancy: response.life_expectancy || 10,
-    remainLife: response.remain_life || 0,
-    usefulLifetimePercent: response.useful_lifetime_percent || 0,
-    replacementYear: response.replacement_year || 0,
-    technology: response.technology,
-    usageStatistics: response.usage_statistics,
-    efficiency: response.efficiency,
-    others: response.others || '',
+
+    // Warranty
+    warrantyPeriod: '',
+    warrantyStartDate: '',
+    warrantyEndDate: '',
+    warrantyPm: '',
+    warrantyCal: '',
+
+    // PM & CM
+    lastPmDate: '',
+    lastCalDate: '',
+    pmPeriod: '',
+    calPeriod: '',
+    vendorPm: '',
+    vendorCal: '',
+
+    // Specs
+    powerConsumption: '',
+    supplier: '',
+    ownership: '',
+    manufacturingCountry: '',
+
+    // Documents
+    poNo: '',
+    contractNo: '',
+    invoiceNo: '',
+    documentNo: '',
+    torNo: '',
+    nsmartItemCode: '',
+
+    // Misc
+    remark: '',
+    approvedBy: '',
+    updatedBy: ''
   };
 }
 

@@ -22,23 +22,72 @@ export interface EquipmentListItem {
 export interface CreateEquipmentRequest {
   id_code: string;
   serial_no: string;
-  assessment_id?: string;
+  status: string;
+
+  // Extra Info
+  asset_type_name?: string;
+  asset_name?: string;
+  asset_id?: string;
+  ecri_code?: string;
+
+  // Status & Location
+  asset_status_internal?: string;
+  rental_status?: string;
+  borrow_status?: string;
+  building?: string;
+  floor?: string;
+  room?: string;
+  phone_no?: string;
+
+  // Business & Item Info
+  business_name?: string;
+  item_no?: string;
+  sku_no?: string;
+
   department: string;
   brand: string;
   model: string;
   category: string;
   receive_date: string;
+  purchase_date?: string;
+  registration_date?: string;
   purchase_price: number;
-  equipment_age: number;
-  compute_date?: string;
+  revenue_per_month?: number | null;
   life_expectancy: number;
-  remain_life: number;
-  useful_lifetime_percent: number;
-  replacement_year?: number;
-  technology?: number | null;
-  usage_statistics?: number | null;
-  efficiency?: number | null;
-  others?: string;
+
+  // Warranty
+  warranty_period?: string;
+  warranty_start_date?: string;
+  warranty_end_date?: string;
+  warranty_pm?: string;
+  warranty_cal?: string;
+
+  // PM & CM
+  last_pm_date?: string;
+  last_cal_date?: string;
+  pm_period?: string;
+  cal_period?: string;
+  vendor_pm?: string;
+  vendor_cal?: string;
+
+  // Specs
+  power_consumption?: string;
+  supplier?: string;
+  ownership?: string;
+  manufacturing_country?: string;
+
+  // Documents
+  po_no?: string;
+  contract_no?: string;
+  invoice_no?: string;
+  document_no?: string;
+  tor_no?: string;
+  nsmart_item_code?: string;
+
+  // Misc
+  remark?: string;
+  approved_by?: string;
+  updated_by?: string;
 }
 
 
@@ -207,42 +256,81 @@ export interface EquipmentStats {
 }
 // types/equipment.ts
 
-export interface ExcelData {
+export type ExcelData = EquipmentFormData;
+
+export interface EquipmentFormData {
   // Basic Info
   idCode: string;
   serialNo: string;
-  assessmentId: string;
-
-  // Relations
   department: string;
-  category: string;
   brand: string;
   model: string;
+  category: string;
+  status: string;
+  assetTypeName: string;
+  assetName: string;
+  assetId: string;
+  ecriCode: string;
 
-  // Date & Price
+  // Status & Location
+  assetStatusInternal: string;
+  rentalStatus: string;
+  borrowStatus: string;
+  building: string;
+  floor: string;
+  room: string;
+  phoneNo: string;
+
+  // Business & Item Info
+  businessName: string;
+  itemNo: string;
+  skuNo: string;
+
+  // Dates
   receiveDate: string;
-  purchasePrice: number;
+  purchaseDate: string;
+  registrationDate: string;
 
-  // Life Cycle
-  lifeExpectancy: number;
-  equipmentAge: number;
-  computeDate: string;
-  remainLife: number;
-  usefulLifetimePercent: number;
-  replacementYear: number;
+  // Financial
+  purchasePrice: number | '';
+  revenuePerMonth: number | '';
 
-  // Assessment Scores (0-5)
-  technology: number | null;
-  usageStatistics: number | null;
-  efficiency: number | null;
-  others: string;
+  // Lifecycle
+  lifeExpectancy: number | '';
 
-  // Excel-specific fields (optional)
-  ecriRisk?: string;
-  classification?: string;
-  totalCM?: number;
-  totalCost?: number;
-  perCostPrice?: number;
+  // Warranty
+  warrantyPeriod: string;
+  warrantyStartDate: string;
+  warrantyEndDate: string;
+  warrantyPm: string;
+  warrantyCal: string;
+
+  // PM & CAL
+  lastPmDate: string;
+  lastCalDate: string;
+  pmPeriod: string;
+  calPeriod: string;
+  vendorPm: string;
+  vendorCal: string;
+
+  // Specs & Ownership
+  powerConsumption: string;
+  supplier: string;
+  ownership: string;
+  manufacturingCountry: string;
+
+  // Documents
+  poNo: string;
+  contractNo: string;
+  invoiceNo: string;
+  documentNo: string;
+  torNo: string;
+  nsmartItemCode: string;
+
+  // Misc
+  remark: string;
+  approvedBy: string;
+  updatedBy: string;
 }
 
 export interface ExcelUploadProps {
@@ -251,33 +339,7 @@ export interface ExcelUploadProps {
   onCancel?: () => void;
 }
 
-export interface EquipmentFormData {
-  // Basic Info
-  idCode: string;
-  serialNo: string;
-  assessmentId: string;
 
-  department: string;
-  brand: string;
-  model: string;
-  category: string;
-
-  // Date & Price
-  receiveDate: string;
-  purchasePrice: number;
-
-  equipmentAge: number;
-  computeDate: string;
-  lifeExpectancy: number;
-  remainLife: number;
-  usefulLifetimePercent: number;
-  replacementYear: number;
-
-  technology: number | null;
-  usageStatistics: number | null;
-  efficiency: number | null;
-  others: string;
-}
 
 export interface EquipmentFormProps {
   onSubmit: (data: EquipmentFormData) => void;

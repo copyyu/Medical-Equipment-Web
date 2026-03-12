@@ -6,25 +6,78 @@ import { createEquipment } from '../../service/equipmentService';
 
 const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => {
   const [formData, setFormData] = useState<EquipmentFormData>({
+    // Basic Info
     idCode: '',
     serialNo: '',
-    assessmentId: '',
     department: '',
     brand: '',
     model: '',
     category: '',
+    status: 'active',
+    assetTypeName: '',
+    assetName: '',
+    assetId: '',
+    ecriCode: '',
+
+    // Status & Location
+    assetStatusInternal: '',
+    rentalStatus: '',
+    borrowStatus: '',
+    building: '',
+    floor: '',
+    room: '',
+    phoneNo: '',
+
+    // Business & Item Info
+    businessName: '',
+    itemNo: '',
+    skuNo: '',
+
+    // Dates
     receiveDate: '',
-    purchasePrice: 0,
-    equipmentAge: 0,
-    computeDate: '',
+    purchaseDate: '',
+    registrationDate: '',
+
+    // Financial
+    purchasePrice: '', // Using empty string for UI number inputs to show placeholder
+    revenuePerMonth: '',
+
+    // Lifecycle
     lifeExpectancy: 10,
-    remainLife: 0,
-    usefulLifetimePercent: 0,
-    replacementYear: 0,
-    technology: null,
-    usageStatistics: null,
-    efficiency: null,
-    others: ''
+
+    // Warranty
+    warrantyPeriod: '',
+    warrantyStartDate: '',
+    warrantyEndDate: '',
+    warrantyPm: '',
+    warrantyCal: '',
+
+    // PM & CAL
+    lastPmDate: '',
+    lastCalDate: '',
+    pmPeriod: '',
+    calPeriod: '',
+    vendorPm: '',
+    vendorCal: '',
+
+    // Specs & Ownership
+    powerConsumption: '',
+    supplier: '',
+    ownership: '',
+    manufacturingCountry: '',
+
+    // Documents
+    poNo: '',
+    contractNo: '',
+    invoiceNo: '',
+    documentNo: '',
+    torNo: '',
+    nsmartItemCode: '',
+
+    // Misc
+    remark: '',
+    approvedBy: '',
+    updatedBy: ''
   });
 
   const [loading, setLoading] = useState(false);
@@ -42,56 +95,10 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value === '' ? null : parseFloat(value)
+      [name]: value === '' ? '' : parseFloat(value)
     }));
   };
 
-  const calculateAge = () => {
-    if (!formData.receiveDate) {
-      // 🔔 Alert แจ้งเตือน: กรณียังไม่ใส่วันที่
-      Swal.fire({
-        icon: 'warning',
-        title: 'แจ้งเตือน',
-        text: 'กรุณาระบุ "วันที่รับอุปกรณ์" ก่อนกดคำนวณครับ',
-        confirmButtonText: 'ตกลง',
-        confirmButtonColor: '#f59e0b', // สีส้ม
-        customClass: {
-          popup: 'rounded-xl',
-          confirmButton: 'rounded-lg px-6'
-        }
-      });
-      return;
-    }
-
-    const receiveDate = new Date(formData.receiveDate);
-    const computeDate = new Date();
-
-    // อายุเครื่อง = ปีปัจจุบัน - ปีรับเครื่อง
-    const equipmentAge = parseFloat(
-      ((computeDate.getTime() - receiveDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25)).toFixed(2)
-    );
-
-    // อายุคาดหวัง (default = 10 ปี)
-    const lifeExpectancy = formData.lifeExpectancy || 10;
-
-    // อายุคงเหลือ = อายุคาดหวัง - อายุเครื่อง
-    const remainLife = parseFloat((lifeExpectancy - equipmentAge).toFixed(2));
-
-    // %การใช้งาน = (อายุเครื่อง / อายุคาดหวัง) × 100
-    const usefulLifetimePercent = parseFloat(((equipmentAge / lifeExpectancy) * 100).toFixed(2));
-
-    // ปีที่ต้องเปลี่ยน = ปีรับเครื่อง + อายุคาดหวัง
-    const replacementYear = receiveDate.getFullYear() + Math.ceil(lifeExpectancy);
-
-    setFormData(prev => ({
-      ...prev,
-      equipmentAge: equipmentAge,
-      computeDate: computeDate.toISOString().split('T')[0],
-      remainLife: remainLife,
-      usefulLifetimePercent: usefulLifetimePercent,
-      replacementYear: replacementYear
-    }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,15 +141,23 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         // Reset form
         setFormData({
-          idCode: '', serialNo: '', assessmentId: '', department: '', brand: '', model: '', category: '',
-          receiveDate: '', purchasePrice: 0, equipmentAge: 0, computeDate: '', lifeExpectancy: 10,
-          remainLife: 0, usefulLifetimePercent: 0, replacementYear: 0, technology: null,
-          usageStatistics: null, efficiency: null, others: ''
+          idCode: '', serialNo: '', department: '', brand: '', model: '', category: '',
+          status: 'active', assetTypeName: '', assetName: '', assetId: '', ecriCode: '',
+          assetStatusInternal: '', rentalStatus: '', borrowStatus: '', building: '', floor: '', room: '', phoneNo: '',
+          businessName: '', itemNo: '', skuNo: '',
+          receiveDate: '', purchaseDate: '', registrationDate: '',
+          purchasePrice: '', revenuePerMonth: '',
+          lifeExpectancy: 10,
+          warrantyPeriod: '', warrantyStartDate: '', warrantyEndDate: '', warrantyPm: '', warrantyCal: '',
+          lastPmDate: '', lastCalDate: '', pmPeriod: '', calPeriod: '', vendorPm: '', vendorCal: '',
+          powerConsumption: '', supplier: '', ownership: '', manufacturingCountry: '',
+          poNo: '', contractNo: '', invoiceNo: '', documentNo: '', torNo: '', nsmartItemCode: '',
+          remark: '', approvedBy: '', updatedBy: ''
         });
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการบันทึกข้อมูล';
-      
+
       // ❌ Alert ผิดพลาด: แจ้งเตือนชัดเจน
       Swal.fire({
         icon: 'error',
@@ -155,7 +170,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
           confirmButton: 'rounded-lg px-6'
         }
       });
-      
+
       setError(errorMessage);
       console.error('Error submitting form:', err);
     } finally {
@@ -214,20 +229,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         </div>
 
         {/* Assessment ID */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            รหัสการประเมิน
-          </label>
-          <input
-            type="text"
-            name="assessmentId"
-            value={formData.assessmentId}
-            onChange={handleChange}
-            disabled={loading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-            placeholder="เช่น ASSESS-2024-001"
-          />
-        </div>
+
 
         {/* Department */}
         <div>
@@ -260,6 +262,237 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
             disabled={loading}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
             placeholder="เช่น MRI Scanner"
+          />
+        </div>
+
+        {/* -------- Section: Status & Location -------- */}
+        <div className="md:col-span-2 pt-4 border-t border-gray-100 mt-2">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">สถานะ & สถานที่ตั้ง</h3>
+        </div>
+
+        {/* Status */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            สถานะ (System Status)
+          </label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange as any}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="disposed">Disposed</option>
+          </select>
+        </div>
+
+        {/* Internal Status */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            สถานะภายใน (Internal Status)
+          </label>
+          <input
+            type="text"
+            name="assetStatusInternal"
+            value={formData.assetStatusInternal}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น In-Use, In-Store"
+          />
+        </div>
+
+        {/* Rental Status */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            สถานะการเช่า (Rental)
+          </label>
+          <input
+            type="text"
+            name="rentalStatus"
+            value={formData.rentalStatus}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น เช่ามา, ให้เช่า, None"
+          />
+        </div>
+
+        {/* Borrow Status */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            สถานะการยืม (Borrow)
+          </label>
+          <input
+            type="text"
+            name="borrowStatus"
+            value={formData.borrowStatus}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น ยืมมา, ให้ยืม, None"
+          />
+        </div>
+
+        {/* Building */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ตึก</label>
+          <input
+            type="text"
+            name="building"
+            value={formData.building}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น ตึกอำนวยการ"
+          />
+        </div>
+
+        {/* Floor */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ชั้น</label>
+          <input
+            type="text"
+            name="floor"
+            value={formData.floor}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น ชั้น 3"
+          />
+        </div>
+
+        {/* Room */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ห้อง</label>
+          <input
+            type="text"
+            name="room"
+            value={formData.room}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น ICU-301"
+          />
+        </div>
+
+        {/* Phone No */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">เบอร์โทรศัพท์ (ถ้ามี)</label>
+          <input
+            type="text"
+            name="phoneNo"
+            value={formData.phoneNo}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น 02-123-4567 ext 301"
+          />
+        </div>
+
+        {/* -------- Section: Extra Asset Info -------- */}
+        <div className="md:col-span-2 pt-4 border-t border-gray-100 mt-2">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">ข้อมูลเพิ่มเติม Asset</h3>
+        </div>
+
+        {/* Asset Type Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ประเภท(ชื่อเต็ม)</label>
+          <input
+            type="text"
+            name="assetTypeName"
+            value={formData.assetTypeName}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น Medical Device"
+          />
+        </div>
+
+        {/* Asset Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ชื่ออุปกรณ์</label>
+          <input
+            type="text"
+            name="assetName"
+            value={formData.assetName}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น Patient Monitor Type A"
+          />
+        </div>
+
+        {/* Asset ID (Secondary ID) */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Asset ID ภายใน</label>
+          <input
+            type="text"
+            name="assetId"
+            value={formData.assetId}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น AST-449"
+          />
+        </div>
+
+        {/* ECRI Code */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">รหัส ECRI</label>
+          <input
+            type="text"
+            name="ecriCode"
+            value={formData.ecriCode}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น 12-636"
+          />
+        </div>
+
+        {/* Business Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ชื่อธุรกิจ / คลินิก</label>
+          <input
+            type="text"
+            name="businessName"
+            value={formData.businessName}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น Corp Hospital Clinic"
+          />
+        </div>
+
+        {/* Item No */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Item No</label>
+          <input
+            type="text"
+            name="itemNo"
+            value={formData.itemNo}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น ITM-991"
+          />
+        </div>
+
+        {/* SKU No */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">SKU No</label>
+          <input
+            type="text"
+            name="skuNo"
+            value={formData.skuNo}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น SKU-PH-MX400"
           />
         </div>
 
@@ -297,6 +530,11 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
           />
         </div>
 
+        {/* -------- Section: Documents & Financial -------- */}
+        <div className="md:col-span-2 pt-4 border-t border-gray-100 mt-2">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">ข้อมูลเอกสาร & การเงิน</h3>
+        </div>
+
         {/* Receive Date */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -313,23 +551,155 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
           />
         </div>
 
+        {/* Purchase Date */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            วันที่ซื้ออุปกรณ์
+          </label>
+          <input
+            type="date"
+            name="purchaseDate"
+            value={formData.purchaseDate}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+
+        {/* Registration Date */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            วันที่ลงทะเบียนทะเบียน
+          </label>
+          <input
+            type="date"
+            name="registrationDate"
+            value={formData.registrationDate}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+
         {/* Purchase Price */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            ราคาซื้อ (บาท) <span className="text-red-500">*</span>
+            ราคาซื้อ (บาท)
           </label>
           <input
             type="number"
             name="purchasePrice"
             value={formData.purchasePrice}
             onChange={handleNumberChange}
-            required
             disabled={loading}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
             placeholder="0.00"
             step="0.01"
             min="0"
           />
+        </div>
+
+        {/* Revenue Per Month */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            รายได้เฉลี่ย/เดือน (บาท)
+          </label>
+          <input
+            type="number"
+            name="revenuePerMonth"
+            value={formData.revenuePerMonth}
+            onChange={handleNumberChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+          />
+        </div>
+
+        {/* PO Number */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">PO No.</label>
+          <input
+            type="text"
+            name="poNo"
+            value={formData.poNo}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น PO-2401-449"
+          />
+        </div>
+
+        {/* Contract Number */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Contract No.</label>
+          <input
+            type="text"
+            name="contractNo"
+            value={formData.contractNo}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+
+        {/* Invoice Number */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Invoice No.</label>
+          <input
+            type="text"
+            name="invoiceNo"
+            value={formData.invoiceNo}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+
+        {/* Document Number */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Document No.</label>
+          <input
+            type="text"
+            name="documentNo"
+            value={formData.documentNo}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+
+        {/* TOR Number */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">TOR No.</label>
+          <input
+            type="text"
+            name="torNo"
+            value={formData.torNo}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+
+        {/* N-SMART Item Code */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">N-SMART Code</label>
+          <input
+            type="text"
+            name="nsmartItemCode"
+            value={formData.nsmartItemCode}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น NSM-888"
+          />
+        </div>
+
+        {/* -------- Section: Lifecycle -------- */}
+        <div className="md:col-span-2 pt-4 border-t border-gray-100 mt-2">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">อายุและวงจรชีวิตอุปกรณ์ (Lifecycle)</h3>
         </div>
 
         {/* Life Expectancy */}
@@ -351,163 +721,268 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
           <p className="text-xs text-gray-500 mt-1">ค่าเริ่มต้น 10 ปี</p>
         </div>
 
-        {/* Calculate Age Button */}
-        <div className="md:col-span-2">
-          <button
-            type="button"
-            onClick={calculateAge}
-            disabled={loading || !formData.receiveDate}
-            className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-medium shadow-sm"
-          >
-            คำนวณอายุอุปกรณ์
-          </button>
-          <p className="text-xs text-gray-500 mt-2">
-            คลิกเพื่อคำนวณ: อายุเครื่อง, อายุคงเหลือ, %การใช้งาน, ปีที่ต้องเปลี่ยน
-          </p>
+        {/* -------- Section: Warranty -------- */}
+        <div className="md:col-span-2 pt-4 border-t border-gray-100 mt-2">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">ข้อมูลประกัน (Warranty)</h3>
         </div>
 
-        {/* Equipment Age (Read-only) */}
+        {/* Warranty Period */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            อายุเครื่อง (ปี)
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ระยะเวลาประกัน</label>
           <input
-            type="number"
-            value={formData.equipmentAge}
-            readOnly
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
-            step="0.01"
-          />
-          <p className="text-xs text-gray-500 mt-1">ปีปัจจุบัน - ปีรับเครื่อง</p>
-        </div>
-
-        {/* Compute Date (Read-only) */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            วันที่คำนวณ
-          </label>
-          <input
-            type="date"
-            value={formData.computeDate}
-            readOnly
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
-          />
-        </div>
-
-        {/* Remain Life (Read-only) */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            อายุคงเหลือ (ปี)
-          </label>
-          <input
-            type="number"
-            value={formData.remainLife}
-            readOnly
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
-            step="0.01"
-          />
-          <p className="text-xs text-gray-500 mt-1">อายุคาดหวัง - อายุเครื่อง</p>
-        </div>
-
-        {/* Useful Lifetime Percent (Read-only) */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            %การใช้งาน
-          </label>
-          <input
-            type="number"
-            value={formData.usefulLifetimePercent}
-            readOnly
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
-            step="0.01"
-          />
-          <p className="text-xs text-gray-500 mt-1">(อายุเครื่อง / อายุคาดหวัง) × 100</p>
-        </div>
-
-        {/* Replacement Year (Read-only) */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            ปีที่ต้องเปลี่ยน
-          </label>
-          <input
-            type="number"
-            value={formData.replacementYear}
-            readOnly
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
-          />
-          <p className="text-xs text-gray-500 mt-1">ปีรับเครื่อง + อายุคาดหวัง</p>
-        </div>
-
-        {/* Technology Score */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            คะแนนเทคโนโลยี (0-5)
-          </label>
-          <input
-            type="number"
-            name="technology"
-            value={formData.technology ?? ''}
-            onChange={handleNumberChange}
-            disabled={loading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-            placeholder="0.0"
-            min="0"
-            max="5"
-            step="0.1"
-          />
-        </div>
-
-        {/* Usage Statistics Score */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            คะแนนสถิติการใช้งาน (0-5)
-          </label>
-          <input
-            type="number"
-            name="usageStatistics"
-            value={formData.usageStatistics ?? ''}
-            onChange={handleNumberChange}
-            disabled={loading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-            placeholder="0.0"
-            min="0"
-            max="5"
-            step="0.1"
-          />
-        </div>
-
-        {/* Efficiency Score */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            คะแนนประสิทธิภาพ (0-5)
-          </label>
-          <input
-            type="number"
-            name="efficiency"
-            value={formData.efficiency ?? ''}
-            onChange={handleNumberChange}
-            disabled={loading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-            placeholder="0.0"
-            min="0"
-            max="5"
-            step="0.1"
-          />
-        </div>
-
-        {/* Others / Description */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            หมายเหตุเพิ่มเติม
-          </label>
-          <textarea
-            name="others"
-            value={formData.others}
+            type="text"
+            name="warrantyPeriod"
+            value={formData.warrantyPeriod}
             onChange={handleChange}
             disabled={loading}
-            rows={4}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น 2 Years"
+          />
+        </div>
+
+        {/* Warranty Start Date */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">วันเริ่มประกัน</label>
+          <input
+            type="date"
+            name="warrantyStartDate"
+            value={formData.warrantyStartDate}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+
+        {/* Warranty End Date */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">วันสิ้นสุดประกัน</label>
+          <input
+            type="date"
+            name="warrantyEndDate"
+            value={formData.warrantyEndDate}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+
+        {/* Warranty PM */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ประกันการทำ PM</label>
+          <input
+            type="text"
+            name="warrantyPm"
+            value={formData.warrantyPm}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น Included, None"
+          />
+        </div>
+
+        {/* Warranty CAL */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ประกันการทำ CAL</label>
+          <input
+            type="text"
+            name="warrantyCal"
+            value={formData.warrantyCal}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น Included, None"
+          />
+        </div>
+
+        {/* -------- Section: PM & CM -------- */}
+        <div className="md:col-span-2 pt-4 border-t border-gray-100 mt-2">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">ข้อมูลการบำรุงรักษา (PM & CAL)</h3>
+        </div>
+
+        {/* Last PM Date */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">วันที่ทำ PM ล่าสุด</label>
+          <input
+            type="date"
+            name="lastPmDate"
+            value={formData.lastPmDate}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+
+        {/* Last CAL Date */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">วันที่ทำ CAL ล่าสุด</label>
+          <input
+            type="date"
+            name="lastCalDate"
+            value={formData.lastCalDate}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+
+        {/* PM Period */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">รอบการทำ PM</label>
+          <input
+            type="text"
+            name="pmPeriod"
+            value={formData.pmPeriod}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น 6 Months"
+          />
+        </div>
+
+        {/* CAL Period */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">รอบการทำ CAL</label>
+          <input
+            type="text"
+            name="calPeriod"
+            value={formData.calPeriod}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น 1 Year"
+          />
+        </div>
+
+        {/* Vendor PM */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ผู้รับเหมา/บริษัท ทำ PM</label>
+          <input
+            type="text"
+            name="vendorPm"
+            value={formData.vendorPm}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+
+        {/* Vendor CAL */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ผู้รับเหมา/บริษัท ทำ CAL</label>
+          <input
+            type="text"
+            name="vendorCal"
+            value={formData.vendorCal}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+
+        {/* -------- Section: Misc -------- */}
+        <div className="md:col-span-2 pt-4 border-t border-gray-100 mt-2">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">ข้อมูลจำเพาะและการตรวจประเมินอื่นๆ</h3>
+        </div>
+
+        {/* Power Consumption */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">อัตราสเปคไฟฟ้า (Power Consumption)</label>
+          <input
+            type="text"
+            name="powerConsumption"
+            value={formData.powerConsumption}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น 220V 50Hz"
+          />
+        </div>
+
+        {/* Supplier */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ผู้จัดจำหน่าย (Supplier)</label>
+          <input
+            type="text"
+            name="supplier"
+            value={formData.supplier}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น ABC Medical Devices Ltd."
+          />
+        </div>
+
+        {/* Ownership */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">กรรมสิทธิ์/การครอบครอง (Ownership)</label>
+          <input
+            type="text"
+            name="ownership"
+            value={formData.ownership}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น Hospital Owned"
+          />
+        </div>
+
+        {/* Manufacturing Country */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ประเทศที่ผลิต</label>
+          <input
+            type="text"
+            name="manufacturingCountry"
+            value={formData.manufacturingCountry}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น Germany"
+          />
+        </div>
+
+        {/* Approved By */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">อนุมัติโดย</label>
+          <input
+            type="text"
+            name="approvedBy"
+            value={formData.approvedBy}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น Dr. Smith"
+          />
+        </div>
+
+        {/* Remarks / Description */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            หมายเหตุ (Remark)
+          </label>
+          <textarea
+            name="remark"
+            value={formData.remark}
+            onChange={handleChange}
+            disabled={loading}
+            rows={2}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed resize-none"
-            placeholder="ระบุรายละเอียดเพิ่มเติม..."
+            placeholder="เช่น Installed and calibrated. Ready for use."
+          />
+        </div>
+
+        {/* Updated By */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            ผู้แก้ไขล่าสุด (Updated By)
+          </label>
+          <input
+            type="text"
+            name="updatedBy"
+            value={formData.updatedBy}
+            onChange={handleChange}
+            disabled={loading}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            placeholder="เช่น Admin User"
           />
         </div>
       </div>
