@@ -103,7 +103,7 @@ export default function EquipmentTable({ data, total, onView, onEdit, onDelete }
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right">
-                                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="flex items-center justify-end gap-2">
                                             <button onClick={() => onView(item)} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="ดูรายละเอียด">
                                                 <HiOutlineEye className="w-4 h-4" />
                                             </button>

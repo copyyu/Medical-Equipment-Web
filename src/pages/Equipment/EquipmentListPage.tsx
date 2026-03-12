@@ -280,22 +280,31 @@ export default function EquipmentListPage() {
                     >
                         <HiOutlineChevronLeft className="w-4 h-4" />
                     </button>
-                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                        const pageNum = i + 1
-                        return (
-                            <button
-                                key={pageNum}
-                                onClick={() => handlePageChange(pageNum)}
-                                disabled={isLoading}
-                                className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${currentPage === pageNum
-                                    ? 'bg-emerald-500 text-white'
-                                    : 'text-gray-600 hover:bg-gray-100'
-                                    }`}
-                            >
-                                {pageNum}
-                            </button>
-                        )
-                    })}
+                    {(() => {
+                        const maxVisible = 5
+                        let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2))
+                        let endPage = startPage + maxVisible - 1
+                        if (endPage > totalPages) {
+                            endPage = totalPages
+                            startPage = Math.max(1, endPage - maxVisible + 1)
+                        }
+                        return Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+                            const pageNum = startPage + i
+                            return (
+                                <button
+                                    key={pageNum}
+                                    onClick={() => handlePageChange(pageNum)}
+                                    disabled={isLoading}
+                                    className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${currentPage === pageNum
+                                        ? 'bg-emerald-500 text-white'
+                                        : 'text-gray-600 hover:bg-gray-100'
+                                        }`}
+                                >
+                                    {pageNum}
+                                </button>
+                            )
+                        })
+                    })()}
                     <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages || totalPages === 0 || isLoading}
