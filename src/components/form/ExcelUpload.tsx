@@ -14,7 +14,7 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
   // Modal states
   const [showResultModal, setShowResultModal] = useState<boolean>(false);
   const [importResult, setImportResult] = useState<EquipmentImportResult | null>(null);
-  const [detectedHeaders, setDetectedHeaders] = useState<string[]>([]);
+
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -129,13 +129,7 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-      // Detect actual column headers from the Excel file
-      if (jsonData.length > 0) {
-        const headers = Object.keys(jsonData[0] as any);
-        setDetectedHeaders(headers);
-        console.log('📋 Detected Excel headers:', headers);
-        console.log('📋 First row data:', jsonData[0]);
-      }
+
 
       const mappedData: ExcelData[] = jsonData.map((row: any) => {
         const get = (...keys: string[]): any => {
@@ -349,12 +343,7 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
                 พบข้อมูล {previewData.length} รายการพร้อมนำเข้า
               </p>
             </div>
-            {detectedHeaders.length > 0 && (
-              <div className="mt-2 text-xs text-gray-500">
-                <p className="font-medium">📋 Column headers ที่ตรวจพบในไฟล์:</p>
-                <p className="mt-1 break-all">{detectedHeaders.join(', ')}</p>
-              </div>
-            )}
+
           </div>
 
           {/* Preview Table */}

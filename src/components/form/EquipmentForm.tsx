@@ -83,6 +83,10 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // State for custom "อื่นๆ" text inputs
+  const [rentalOther, setRentalOther] = useState('');
+  const [borrowOther, setBorrowOther] = useState('');
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -197,7 +201,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* ID Code */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            รหัสอุปกรณ์ <span className="text-red-500">*</span>
+            รหัสอุปกรณ์ (Id Code) <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -214,7 +218,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Serial Number */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            หมายเลขเครื่อง <span className="text-red-500">*</span>
+            หมายเลขเครื่อง (Serial No) <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -234,7 +238,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Department */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            แผนก <span className="text-red-500">*</span>
+            แผนก (Department) <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -251,7 +255,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Category */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            หมวดหมู่ <span className="text-red-500">*</span>
+            หมวดหมู่ (Category) <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -273,7 +277,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Status */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            สถานะ (System Status)
+            สถานะ (Status)
           </label>
           <select
             name="status"
@@ -292,7 +296,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Internal Status */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            สถานะภายใน (Internal Status)
+            สถานะภายใน (Asset Status Internal)
           </label>
           <input
             type="text"
@@ -308,38 +312,86 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Rental Status */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            สถานะการเช่า (Rental)
+            สถานะการเช่า (Rental Status)
           </label>
-          <input
-            type="text"
+          <select
             name="rentalStatus"
-            value={formData.rentalStatus}
-            onChange={handleChange}
+            value={formData.rentalStatus === '' || formData.rentalStatus === 'เช่ามา' || formData.rentalStatus === 'ให้เช่า' ? formData.rentalStatus : 'อื่นๆ'}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === 'อื่นๆ') {
+                setFormData(prev => ({ ...prev, rentalStatus: rentalOther || 'อื่นๆ' }));
+              } else {
+                setFormData(prev => ({ ...prev, rentalStatus: val }));
+                setRentalOther('');
+              }
+            }}
             disabled={loading}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-            placeholder="เช่น เช่ามา, ให้เช่า, None"
-          />
+          >
+            <option value="">ไม่มี</option>
+            <option value="เช่ามา">เช่ามา</option>
+            <option value="ให้เช่า">ให้เช่า</option>
+            <option value="อื่นๆ">อื่นๆ</option>
+          </select>
+          {(formData.rentalStatus !== '' && formData.rentalStatus !== 'เช่ามา' && formData.rentalStatus !== 'ให้เช่า') && (
+            <input
+              type="text"
+              value={rentalOther}
+              onChange={(e) => {
+                setRentalOther(e.target.value);
+                setFormData(prev => ({ ...prev, rentalStatus: e.target.value || 'อื่นๆ' }));
+              }}
+              disabled={loading}
+              className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+              placeholder="ระบุเหตุผล..."
+            />
+          )}
         </div>
 
         {/* Borrow Status */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            สถานะการยืม (Borrow)
+            สถานะการยืม (Borrow Status)
           </label>
-          <input
-            type="text"
+          <select
             name="borrowStatus"
-            value={formData.borrowStatus}
-            onChange={handleChange}
+            value={formData.borrowStatus === '' || formData.borrowStatus === 'ยืมมา' || formData.borrowStatus === 'ให้ยืม' ? formData.borrowStatus : 'อื่นๆ'}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === 'อื่นๆ') {
+                setFormData(prev => ({ ...prev, borrowStatus: borrowOther || 'อื่นๆ' }));
+              } else {
+                setFormData(prev => ({ ...prev, borrowStatus: val }));
+                setBorrowOther('');
+              }
+            }}
             disabled={loading}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-            placeholder="เช่น ยืมมา, ให้ยืม, None"
-          />
+          >
+            <option value="">ไม่มี</option>
+            <option value="ยืมมา">ยืมมา</option>
+            <option value="ให้ยืม">ให้ยืม</option>
+            <option value="อื่นๆ">อื่นๆ</option>
+          </select>
+          {(formData.borrowStatus !== '' && formData.borrowStatus !== 'ยืมมา' && formData.borrowStatus !== 'ให้ยืม') && (
+            <input
+              type="text"
+              value={borrowOther}
+              onChange={(e) => {
+                setBorrowOther(e.target.value);
+                setFormData(prev => ({ ...prev, borrowStatus: e.target.value || 'อื่นๆ' }));
+              }}
+              disabled={loading}
+              className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+              placeholder="ระบุเหตุผล..."
+            />
+          )}
         </div>
 
         {/* Building */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">ตึก</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ตึก (Building)</label>
           <input
             type="text"
             name="building"
@@ -353,7 +405,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Floor */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">ชั้น</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ชั้น (Floor)</label>
           <input
             type="text"
             name="floor"
@@ -367,7 +419,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Room */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">ห้อง</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ห้อง (Room)</label>
           <input
             type="text"
             name="room"
@@ -381,7 +433,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Phone No */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">เบอร์โทรศัพท์ (ถ้ามี)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">เบอร์โทรศัพท์ (Phone No)</label>
           <input
             type="text"
             name="phoneNo"
@@ -400,7 +452,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Asset Type Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">ประเภท(ชื่อเต็ม)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ประเภท (Asset Type Name)</label>
           <input
             type="text"
             name="assetTypeName"
@@ -414,7 +466,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Asset Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">ชื่ออุปกรณ์</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ชื่ออุปกรณ์ (Asset Name)</label>
           <input
             type="text"
             name="assetName"
@@ -428,7 +480,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Asset ID (Secondary ID) */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Asset ID ภายใน</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Asset ID ภายใน (Asset Id)</label>
           <input
             type="text"
             name="assetId"
@@ -442,7 +494,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* ECRI Code */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">รหัส ECRI</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">รหัส ECRI (ECRI Code)</label>
           <input
             type="text"
             name="ecriCode"
@@ -456,7 +508,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Business Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">ชื่อธุรกิจ / คลินิก</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ชื่อธุรกิจ / คลินิก (Business Name)</label>
           <input
             type="text"
             name="businessName"
@@ -470,7 +522,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Item No */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Item No</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Item No (Item No)</label>
           <input
             type="text"
             name="itemNo"
@@ -484,7 +536,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* SKU No */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">SKU No</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">SKU No (SKU No)</label>
           <input
             type="text"
             name="skuNo"
@@ -499,7 +551,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Brand */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            ยี่ห้อ <span className="text-red-500">*</span>
+            ยี่ห้อ (Brand) <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -516,7 +568,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Model */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            ชื่อรุ่น <span className="text-red-500">*</span>
+            ชื่อรุ่น (Model) <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -538,7 +590,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Receive Date */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            วันที่รับอุปกรณ์ <span className="text-red-500">*</span>
+            วันที่รับอุปกรณ์ (Receive Date) <span className="text-red-500">*</span>
           </label>
           <input
             type="date"
@@ -554,7 +606,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Purchase Date */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            วันที่ซื้ออุปกรณ์
+            วันที่ซื้ออุปกรณ์ (Purchase Date)
           </label>
           <input
             type="date"
@@ -569,7 +621,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Registration Date */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            วันที่ลงทะเบียนทะเบียน
+            วันที่ลงทะเบียน (Registration Date)
           </label>
           <input
             type="date"
@@ -584,7 +636,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Purchase Price */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            ราคาซื้อ (บาท)
+            ราคาซื้อ (Purchase Price)
           </label>
           <input
             type="number"
@@ -602,7 +654,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Revenue Per Month */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            รายได้เฉลี่ย/เดือน (บาท)
+            รายได้เฉลี่ย/เดือน (Revenue Per Month)
           </label>
           <input
             type="number"
@@ -619,7 +671,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* PO Number */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">PO No.</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">PO No. (PO No)</label>
           <input
             type="text"
             name="poNo"
@@ -633,7 +685,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Contract Number */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Contract No.</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Contract No. (Contract No)</label>
           <input
             type="text"
             name="contractNo"
@@ -646,7 +698,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Invoice Number */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Invoice No.</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Invoice No. (Invoice No)</label>
           <input
             type="text"
             name="invoiceNo"
@@ -659,7 +711,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Document Number */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Document No.</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Document No. (Document No)</label>
           <input
             type="text"
             name="documentNo"
@@ -672,7 +724,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* TOR Number */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">TOR No.</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">TOR No. (TOR No)</label>
           <input
             type="text"
             name="torNo"
@@ -685,7 +737,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* N-SMART Item Code */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">N-SMART Code</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">N-SMART Code (NSmart Item Code)</label>
           <input
             type="text"
             name="nsmartItemCode"
@@ -705,7 +757,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
         {/* Life Expectancy */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            อายุการใช้งาน (ปี)
+            อายุการใช้งาน (Life Expectancy)
           </label>
           <input
             type="number"
@@ -728,7 +780,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Warranty Period */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">ระยะเวลาประกัน</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ระยะเวลาประกัน (Warranty Period)</label>
           <input
             type="text"
             name="warrantyPeriod"
@@ -742,7 +794,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Warranty Start Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">วันเริ่มประกัน</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">วันเริ่มประกัน (Warranty Start Date)</label>
           <input
             type="date"
             name="warrantyStartDate"
@@ -755,7 +807,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Warranty End Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">วันสิ้นสุดประกัน</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">วันสิ้นสุดประกัน (Warranty End Date)</label>
           <input
             type="date"
             name="warrantyEndDate"
@@ -768,7 +820,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Warranty PM */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">ประกันการทำ PM</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ประกันการทำ PM (Warranty PM)</label>
           <input
             type="text"
             name="warrantyPm"
@@ -782,7 +834,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Warranty CAL */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">ประกันการทำ CAL</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ประกันการทำ CAL (Warranty CAL)</label>
           <input
             type="text"
             name="warrantyCal"
@@ -801,7 +853,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Last PM Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">วันที่ทำ PM ล่าสุด</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">วันที่ทำ PM ล่าสุด (Last PM Date)</label>
           <input
             type="date"
             name="lastPmDate"
@@ -814,7 +866,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Last CAL Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">วันที่ทำ CAL ล่าสุด</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">วันที่ทำ CAL ล่าสุด (Last CAL Date)</label>
           <input
             type="date"
             name="lastCalDate"
@@ -827,7 +879,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* PM Period */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">รอบการทำ PM</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">รอบการทำ PM (PM Period)</label>
           <input
             type="text"
             name="pmPeriod"
@@ -841,7 +893,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* CAL Period */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">รอบการทำ CAL</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">รอบการทำ CAL (CAL Period)</label>
           <input
             type="text"
             name="calPeriod"
@@ -855,7 +907,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Vendor PM */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">ผู้รับเหมา/บริษัท ทำ PM</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ผู้รับเหมา/บริษัท ทำ PM (Vendor PM)</label>
           <input
             type="text"
             name="vendorPm"
@@ -868,7 +920,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Vendor CAL */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">ผู้รับเหมา/บริษัท ทำ CAL</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ผู้รับเหมา/บริษัท ทำ CAL (Vendor CAL)</label>
           <input
             type="text"
             name="vendorCal"
@@ -928,7 +980,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Manufacturing Country */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">ประเทศที่ผลิต</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ประเทศที่ผลิต (Manufacturing Country)</label>
           <input
             type="text"
             name="manufacturingCountry"
@@ -942,7 +994,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({ onSubmit, onCancel }) => 
 
         {/* Approved By */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">อนุมัติโดย</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">อนุมัติโดย (Approved By)</label>
           <input
             type="text"
             name="approvedBy"
