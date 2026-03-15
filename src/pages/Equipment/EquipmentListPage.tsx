@@ -19,7 +19,8 @@ import DeleteConfirmModal from '../../components/Modal/DeleteConfirmModal'
 
 // Hooks & API
 import { useEquipmentList } from '../../hooks/useEquipmentList'
-import { STATUS_OPTIONS, CATEGORY_OPTIONS, EXPIRY_FILTER_OPTIONS } from '../../constants/equipmentOptions'
+import { fetchCategories } from '../../service/equipmentService'
+import { STATUS_OPTIONS, EXPIRY_FILTER_OPTIONS } from '../../constants/equipmentOptions'
 
 export default function EquipmentListPage() {
     const navigate = useNavigate()
@@ -43,6 +44,14 @@ export default function EquipmentListPage() {
     const [statusFilter, setStatusFilter] = useState<string>('')
     const [categoryFilter, setCategoryFilter] = useState<string>('ทั้งหมด')
     const [expiryFilter, setExpiryFilter] = useState<string>('')
+    const [categoryOptions, setCategoryOptions] = useState<string[]>(['ทั้งหมด'])
+
+    // Fetch categories from API on mount
+    useEffect(() => {
+        fetchCategories().then(categories => {
+            setCategoryOptions(['ทั้งหมด', ...categories])
+        })
+    }, [])
 
     // Modal state
     const [selectedEquipment, setSelectedEquipment] = useState<EquipmentListItem | null>(null)
@@ -217,7 +226,7 @@ export default function EquipmentListPage() {
                                 onChange={(e) => setCategoryFilter(e.target.value)}
                                 className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none cursor-pointer"
                             >
-                                {CATEGORY_OPTIONS.map(cat => (
+                                {categoryOptions.map(cat => (
                                     <option key={cat} value={cat}>{cat}</option>
                                 ))}
                             </select>

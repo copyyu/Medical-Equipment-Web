@@ -213,7 +213,10 @@ export async function fetchEquipmentList(params: EquipmentListParams = {}): Prom
   if (params.sort_dir) queryParams.append('sort_dir', params.sort_dir)
   if (params.expiry_filter) queryParams.append('expiry_filter', params.expiry_filter)
 
-  const response = await api.get<ApiResponse<EquipmentListResponse>>(`/api/equipment?${queryParams.toString()}`)
+  const queryString = queryParams.toString()
+  const url = queryString ? `/api/equipment?${queryString}` : '/api/equipment'
+
+  const response = await api.get<ApiResponse<EquipmentListResponse>>(url)
 
   return {
     data: response.data.data.map(mapApiItemToFrontend),
@@ -253,4 +256,15 @@ export async function importExcelFile(
   const formData = new FormData();
   formData.append('file', file);
   return api.upload<ApiResponse<EquipmentImportResult>>('/import', formData);
+}
+
+// Fetch equipment categories from API
+export async function fetchCategories(): Promise<string[]> {
+  try {
+    const response = await api.get<ApiResponse<{ id: number; name: string; ecri_risk: string; classification: string }[]>>('/api/equipment/categories')
+    return response.data.map(cat => cat.name)
+  } catch (err) {
+    console.error('Error fetching categories:', err)
+    return []
+  }
 }
