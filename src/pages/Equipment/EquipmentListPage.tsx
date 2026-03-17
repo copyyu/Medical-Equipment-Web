@@ -19,7 +19,7 @@ import DeleteConfirmModal from '../../components/Modal/DeleteConfirmModal'
 
 // Hooks & API
 import { useEquipmentList } from '../../hooks/useEquipmentList'
-import { fetchCategories } from '../../service/equipmentService'
+import { fetchCategories, type CategoryOption } from '../../service/equipmentService'
 import { STATUS_OPTIONS, EXPIRY_FILTER_OPTIONS } from '../../constants/equipmentOptions'
 
 export default function EquipmentListPage() {
@@ -42,14 +42,14 @@ export default function EquipmentListPage() {
     const [searchTerm, setSearchTerm] = useState('')
     const [isFilterOpen, setIsFilterOpen] = useState(false)
     const [statusFilter, setStatusFilter] = useState<string>('')
-    const [categoryFilter, setCategoryFilter] = useState<string>('ทั้งหมด')
+    const [categoryFilter, setCategoryFilter] = useState<string>('')
     const [expiryFilter, setExpiryFilter] = useState<string>('')
-    const [categoryOptions, setCategoryOptions] = useState<string[]>(['ทั้งหมด'])
+    const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([])
 
     // Fetch categories from API on mount
     useEffect(() => {
         fetchCategories().then(categories => {
-            setCategoryOptions(['ทั้งหมด', ...categories])
+            setCategoryOptions(categories)
         })
     }, [])
 
@@ -67,20 +67,17 @@ export default function EquipmentListPage() {
                 limit: itemsPerPage,
                 search: searchTerm || undefined,
                 status: statusFilter || undefined,
-                expiry_filter: expiryFilter || undefined
+                expiry_filter: expiryFilter || undefined,
+                category_id: categoryFilter || undefined
             })
         }, 300) // Debounce search
 
         return () => clearTimeout(debounceTimer)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchTerm, statusFilter, expiryFilter])
+    }, [searchTerm, statusFilter, expiryFilter, categoryFilter])
 
-    // Filter by category locally (since API doesn't support it yet)
-    // Note: expiry filter is now handled server-side
-    const filteredEquipment = equipment.filter(item => {
-        const matchesCategory = categoryFilter === 'ทั้งหมด' || item.category === categoryFilter
-        return matchesCategory
-    })
+    // Equipment is directly used since backend handles all filtering now
+    const filteredEquipment = equipment
 
     // Page change handler - preserve current search and status filters
     const handlePageChange = (newPage: number) => {
@@ -89,7 +86,8 @@ export default function EquipmentListPage() {
             limit: itemsPerPage,
             search: searchTerm || undefined,
             status: statusFilter || undefined,
-            expiry_filter: expiryFilter || undefined
+            expiry_filter: expiryFilter || undefined,
+            category_id: categoryFilter || undefined
         })
     }
 
@@ -226,8 +224,9 @@ export default function EquipmentListPage() {
                                 onChange={(e) => setCategoryFilter(e.target.value)}
                                 className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none cursor-pointer"
                             >
+                                <option value="">ทั้งหมด</option>
                                 {categoryOptions.map(cat => (
-                                    <option key={cat} value={cat}>{cat}</option>
+                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
                                 ))}
                             </select>
                         </div>

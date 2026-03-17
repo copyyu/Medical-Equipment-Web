@@ -37,6 +37,12 @@ export interface EquipmentListParams {
   sort_by?: string
   sort_dir?: string
   expiry_filter?: string
+  category_id?: number | string
+}
+
+export interface CategoryOption {
+  id: number
+  name: string
 }
 
 // Map API item to frontend EquipmentListItem
@@ -212,6 +218,7 @@ export async function fetchEquipmentList(params: EquipmentListParams = {}): Prom
   if (params.sort_by) queryParams.append('sort_by', params.sort_by)
   if (params.sort_dir) queryParams.append('sort_dir', params.sort_dir)
   if (params.expiry_filter) queryParams.append('expiry_filter', params.expiry_filter)
+  if (params.category_id) queryParams.append('category_id', params.category_id.toString())
 
   const queryString = queryParams.toString()
   const url = queryString ? `/api/equipment?${queryString}` : '/api/equipment'
@@ -259,10 +266,10 @@ export async function importExcelFile(
 }
 
 // Fetch equipment categories from API
-export async function fetchCategories(): Promise<string[]> {
+export async function fetchCategories(): Promise<CategoryOption[]> {
   try {
     const response = await api.get<ApiResponse<{ id: number; name: string; ecri_risk: string; classification: string }[]>>('/api/equipment/categories')
-    return response.data.map(cat => cat.name)
+    return response.data.map(cat => ({ id: cat.id, name: cat.name }))
   } catch (err) {
     console.error('Error fetching categories:', err)
     return []
