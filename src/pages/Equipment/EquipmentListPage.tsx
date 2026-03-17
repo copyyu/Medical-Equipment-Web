@@ -4,14 +4,13 @@ import {
     HiOutlineMagnifyingGlass,
     HiOutlineFunnel,
     HiOutlinePlus,
-    HiOutlineChevronLeft,
-    HiOutlineChevronRight,
     HiOutlineArrowPath,
     HiOutlineExclamationTriangle
 } from 'react-icons/hi2'
 
 // Components
 import EquipmentTable from '../../components/Table/EquipmentTable'
+import Pagination from '../../components/Pagination/Pagination'
 import type { EquipmentListItem } from '../../types/equipment'
 import ViewEquipmentModal from '../../components/Modal/ViewEquipmentModal'
 import EditEquipmentModal from '../../components/Modal/EditEquipmentModal'
@@ -273,47 +272,12 @@ export default function EquipmentListPage() {
                 <p className="text-sm text-gray-500">
                     แสดง {filteredEquipment.length} จาก {total} รายการ
                 </p>
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1 || isLoading}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <HiOutlineChevronLeft className="w-4 h-4" />
-                    </button>
-                    {(() => {
-                        const maxVisible = 5
-                        let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2))
-                        let endPage = startPage + maxVisible - 1
-                        if (endPage > totalPages) {
-                            endPage = totalPages
-                            startPage = Math.max(1, endPage - maxVisible + 1)
-                        }
-                        return Array.from({ length: endPage - startPage + 1 }, (_, i) => {
-                            const pageNum = startPage + i
-                            return (
-                                <button
-                                    key={pageNum}
-                                    onClick={() => handlePageChange(pageNum)}
-                                    disabled={isLoading}
-                                    className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${currentPage === pageNum
-                                        ? 'bg-emerald-500 text-white'
-                                        : 'text-gray-600 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    {pageNum}
-                                </button>
-                            )
-                        })
-                    })()}
-                    <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages || totalPages === 0 || isLoading}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <HiOutlineChevronRight className="w-4 h-4" />
-                    </button>
-                </div>
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    disabled={isLoading}
+                />
             </div>
 
             {/* Modals */}

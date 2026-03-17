@@ -11,6 +11,7 @@ import {
 import { useActivityLogStore } from '../../stores/activityLogStore'
 import { exportLogsToCSV, fetchActivityLogs } from '../../service/activityLogService'
 import { ticketStatusConfig, type TicketStatus } from '../../types/ticket'
+import Pagination from '../../components/Pagination/Pagination'
 
 // Ticket Status badge component
 function StatusBadge({ status }: { status: string }) {
@@ -303,49 +304,13 @@ export default function ActivityLogPage() {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                    <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
-                        <button
-                            onClick={() => { setPage(page - 1); fetchLogs({ ...filters, page: page - 1 }); }}
-                            disabled={page <= 1}
-                            className="px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                        >
-                            ← ก่อนหน้า
-                        </button>
-
-                        <div className="flex items-center gap-1">
-                            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                                let pageNum: number
-                                if (totalPages <= 5) {
-                                    pageNum = i + 1
-                                } else if (page <= 3) {
-                                    pageNum = i + 1
-                                } else if (page >= totalPages - 2) {
-                                    pageNum = totalPages - 4 + i
-                                } else {
-                                    pageNum = page - 2 + i
-                                }
-                                return (
-                                    <button
-                                        key={pageNum}
-                                        onClick={() => { setPage(pageNum); fetchLogs({ ...filters, page: pageNum }); }}
-                                        className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${pageNum === page
-                                            ? 'bg-gradient-primary text-white shadow-md'
-                                            : 'text-gray-600 hover:bg-gray-100'
-                                            }`}
-                                    >
-                                        {pageNum}
-                                    </button>
-                                )
-                            })}
-                        </div>
-
-                        <button
-                            onClick={() => { setPage(page + 1); fetchLogs({ ...filters, page: page + 1 }); }}
-                            disabled={page >= totalPages}
-                            className="px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                        >
-                            ถัดไป →
-                        </button>
+                    <div className="px-5 py-4 border-t border-gray-100">
+                        <Pagination
+                            currentPage={page}
+                            totalPages={totalPages}
+                            onPageChange={(newPage) => { setPage(newPage); fetchLogs({ ...filters, page: newPage }); }}
+                            disabled={isLoading}
+                        />
                     </div>
                 )}
             </div>
