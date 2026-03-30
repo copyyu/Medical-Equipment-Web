@@ -357,6 +357,7 @@ export interface EquipmentUpdateRequest {
 export interface EquipmentImportResult {
   total_rows: number;
   success_count: number;
+  updated_count: number;
   failed_count: number;
   skipped_count: number;
   new_brands?: number;
