@@ -237,6 +237,7 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
       setImportResult({
         total_rows: 0,
         success_count: 0,
+        updated_count: 0,
         failed_count: 0,
         skipped_count: 0,
         error_messages: [errorMessage]
@@ -430,18 +431,18 @@ const ExcelUpload: React.FC<ExcelUploadProps> = ({ onImportComplete }) => {
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">- สำเร็จ:</span>
+                  <span className="text-gray-400">- เพิ่มใหม่:</span>
                   <span className="font-semibold text-green-400">{importResult.success_count} รายการ</span>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">- ซ้ำเหลือ:</span>
-                  <span className="font-semibold text-amber-400">{importResult.skipped_count} รายการ</span>
+                  <span className="text-gray-400">- อัปเดต (ซ้ำในระบบ):</span>
+                  <span className="font-semibold text-amber-400">{importResult.updated_count} รายการ</span>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">- ข้าม:</span>
-                  <span className="font-semibold text-yellow-400">{importResult.failed_count} รายการ</span>
+                  <span className="text-gray-400">- ผิดพลาด:</span>
+                  <span className="font-semibold text-red-400">{importResult.failed_count} รายการ</span>
                 </div>
               </div>
             </div>
